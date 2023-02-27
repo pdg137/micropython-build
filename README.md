@@ -48,11 +48,11 @@ that you can use.  It will not contain a file system or example code for the rob
 This project relies on the following third-party projects:
 
 - [MicroPython](https://github.com/micropython/micropython)
-- [mbedtls](https://github.com/ARMmbed/mbedtls)
-- [micropython-lib](https://github.com/micropython-lib)
-- [pico-sdk](https://github.com/raspberrypi/pico-sdk/)
-- [tinyusb](https://github.com/tinyusb)
-- [ulab](https://github.com/micropython-ulab)
+- [Mbed TLS](https://github.com/ARMmbed/mbedtls)
+- [micropython-lib](https://github.com/micropython/micropython-lib)
+- [Raspberry Pi Pico SDK](https://github.com/raspberrypi/pico-sdk)
+- [TinyUSB](https://github.com/hathach/tinyusb)
+- [ulab](https://github.com/v923z/micropython-ulab)
 - [Nixpkgs](https://github.com/nixos/nixpkgs) and [Nix]
 
 It also incorporates example code written by Pololu:
@@ -60,5 +60,5 @@ It also incorporates example code written by Pololu:
 - [Pololu 3pi+ 2040 Robot Example Code](https://github.com/pololu/pololu-3pi-plus-2040-robot-example-code)
 
 [Git]: https://git-scm.com/
-[Nix]: https://nixos.org/
+[Nix]: https://github.com/nixos/nix
 [MicroPython]: https://micropython.org/
