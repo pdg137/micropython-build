@@ -7,7 +7,9 @@ let
   short_date = (builtins.substring 2 2 date) +
     (builtins.substring 5 2 date) + (builtins.substring 8 2 date);
 
-  build_git_tag = short_date + "-" + builtins.getEnv "COMMIT";
+  build_git_tag = if builtins.getEnv "COMMIT" == "" then
+    builtins.throw "Be sure to use build.sh.  See README." else
+    short_date + "-" + (builtins.substring 0 7 (builtins.getEnv "COMMIT"));
 
   # 2022-12-14, nixos-22.11 branch
   nixpkgs = import (fetchTarball
