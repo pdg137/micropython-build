@@ -31,14 +31,14 @@ let
     src = pkgs.fetchFromGitHub {
       owner = "pdg137";  # TODO: move to pololu
       repo = "micropython";
-      rev = "228269a7b933a813349e0be45a8d7b7eab048cfc";  # 2023-02-24
+      rev = "228269a7b933a813349e0be45a8d7b7eab048cfc";  # 3pi+ branch, 2023-02-24
       hash = "sha256-rgmJUILVnRh94CT2fAJPVQ3APgxNP0ONaYaa0h/n1uQ=";
     };
 
     # After changing the micropython version, run
     # 'git describe --tags' to get the new values for these:
     version = "v1.19.1";
-    version_suffix = "-847";
+    version_suffix = "-900";
     MICROPY_GIT_TAG = version + version_suffix + "-g" + MICROPY_GIT_HASH;
     MICROPY_GIT_HASH = builtins.substring 0 9 src.rev;
 
@@ -58,8 +58,8 @@ let
     lib_micropython_lib = pkgs.fetchFromGitHub {
       owner = "micropython";
       repo = "micropython-lib";
-      rev = "038b4ac6572d0d5b4c18148dc7d7fdc026369fa4";
-      hash = "sha256-LLSxEKF4wENO7C9kL3F3oDHl/2dzUNJf6SnbVdx0lTc=";
+      rev = "c1526d2d1eb68c4c3b0ff8940b012c98a80301f1";
+      hash = "sha256-NRMbQJH4Fx9Bl8KEHQ1yzdvb6bRyLw9SC1xjURXy41I=";
     };
     lib_pico_sdk = pkgs.fetchFromGitHub {
       owner = "pdg137";  # TODO: move to pololu

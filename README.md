@@ -30,7 +30,7 @@ cd micropython
 # This part can go away once our changes are merged.
 git remote add pololu https://github.com/pololu/micropython.git
 git fetch pololu
-git checkout pololu/dev/paul/3pi+
+git checkout pololu/3pi+
 
 make -C mpy-cross # build Python cross-compiler
 
