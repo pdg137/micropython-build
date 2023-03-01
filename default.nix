@@ -2,7 +2,7 @@ let
   # This date is used to identify releases.  It gets baked into the filenames,
   # file system timestamps, and `sys.version` in Python.  Update it when
   # making a new release.
-  date = "2023-02-27";
+  date = "2023-02-28";
 
   short_date = (builtins.substring 2 2 date) +
     (builtins.substring 5 2 date) + (builtins.substring 8 2 date);
@@ -19,7 +19,7 @@ let
   example_code = fetchGit {
     url = "${builtins.getEnv "POLOLU_VCS"}pololu-3pi-plus-2040-robot-example-code";
     ref = "master";
-    rev = "69336542612368dcd6d09cef9896bd38bd7a9734";  # 2023-02-27
+    rev = "e2f506810db2603d411d1ddc12cb4fc887833ea2";  # 2023-02-27
   };
 
   base = pkgs.stdenv.mkDerivation rec {
@@ -31,14 +31,14 @@ let
     src = pkgs.fetchFromGitHub {
       owner = "pdg137";  # TODO: move to pololu
       repo = "micropython";
-      rev = "228269a7b933a813349e0be45a8d7b7eab048cfc";  # 3pi+ branch, 2023-02-24
-      hash = "sha256-rgmJUILVnRh94CT2fAJPVQ3APgxNP0ONaYaa0h/n1uQ=";
+      rev = "e0c100cba74d0bb821a2ec9f43f14e7167a00042";  # 3pi+ branch, 2023-02-28
+      hash = "sha256-KDpvsOnIufB1g/B47NbBVBrNNYZSv0mXzOFgTUQkti8=";
     };
 
     # After changing the micropython version, run
     # 'git describe --tags' to get the new values for these:
     version = "v1.19.1";
-    version_suffix = "-900";
+    version_suffix = "-901";
     MICROPY_GIT_TAG = version + version_suffix + "-g" + MICROPY_GIT_HASH;
     MICROPY_GIT_HASH = builtins.substring 0 9 src.rev;
 

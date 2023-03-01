@@ -35,3 +35,5 @@ cmake --build .
 mkdir $out
 cp --no-preserve=mode firmware.uf2 $out/$name.uf2
 cp --no-preserve=mode firmware.bin $out/$name.bin
+
+echo "Built $MICROPY_BANNER_NAME_AND_VERSION"
