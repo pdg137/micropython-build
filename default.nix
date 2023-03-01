@@ -2,7 +2,7 @@ let
   # This date is used to identify releases.  It gets baked into the filenames,
   # file system timestamps, and `sys.version` in Python.  Update it when
   # making a new release.
-  date = "2023-02-28";
+  date = "2023-03-01";
 
   short_date = (builtins.substring 2 2 date) +
     (builtins.substring 5 2 date) + (builtins.substring 8 2 date);
@@ -19,7 +19,7 @@ let
   example_code = fetchGit {
     url = "${builtins.getEnv "POLOLU_VCS"}pololu-3pi-plus-2040-robot-example-code";
     ref = "master";
-    rev = "e2f506810db2603d411d1ddc12cb4fc887833ea2";  # 2023-02-27
+    rev = "4ca21e43079fafd4451f48f510b7c525e649049c";  # 2023-03-01
   };
 
   base = pkgs.stdenv.mkDerivation rec {
