@@ -101,9 +101,9 @@ let
 
   image = pkgs.stdenv.mkDerivation {
     name = "micropython" + base.name_suffix;
-    inherit date;
-    base_bin = "${base}/${base.name}.bin";
-    demo = "${example_code}/micropython_demo";
+    board_name = "Pololu 3pi+ 2040 Robot";
+    start_url = "https://www.pololu.com/3pi+/start";
+    inherit date base example_code;
     bin2uf2 = ./bin2uf2.rb;
     buildInputs = [ pkgs.dosfstools pkgs.libfaketime pkgs.mtools pkgs.ruby ];
     builder = ./image_builder.sh;

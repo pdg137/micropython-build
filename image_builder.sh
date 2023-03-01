@@ -5,19 +5,37 @@ set -u
 SOURCE_DATE_EPOCH=$(date -u --date=$date +%s)
 
 # Expand MicroPython image to 1 MiB.
-ruby -e 'print ARGF.read.b.ljust(1024*1024, "\xFF")' $base_bin > base.bin
+ruby -e 'print ARGF.read.b.ljust(1024*1024, "\xFF")' $base/*.bin > base.bin
 
 # Create a 15 MiB FAT file system.
-ruby -e 'print "\xFF"*15*1024*1024' > demo.bin
+ruby -e 'print "\xFF"*15*1024*1024' > files.bin
 faketime $date mkfs.fat -S 4096 -s 1 -f 1 -g 255/63 \
-  -i 0 -n 'MicroPython' demo.bin
+  -i 0 -n 'MicroPython' files.bin
 
-# Copy our Python code into the file system.
-faketime $date mcopy -i demo.bin -s $demo/* ::
+# Assemble the files for the file system.
 
-cat base.bin demo.bin > image.bin
+cp --no-preserve=mode -r $example_code/micropython_demo files
+cp --no-preserve=mode -r $base/licenses files/
+cp $example_code/LICENSE.txt files/licenses/LICENSE_pololu.txt
+cp $example_code/LICENSE_* files/licenses/
 
-ruby $bin2uf2 image.bin image.uf2
+cat > files/_README.html <<END
+<!DOCTYPE html>
+<html lang="en">
+<head><title>$board_name</title></head><body>
+
+<p style="font-size: 120%; text-align: center">
+To get started with the $board_name, please visit our website:<br><br>
+<strong>
+  <a href="$start_url">$start_url</a>
+</strong>
+</p></body></html>
+END
+
+# Copy the files into the file system.
+faketime $date mcopy -i files.bin files/* ::
+
+cat base.bin files.bin > image.bin
 
 mkdir $out
-mv image.uf2 $out/$name.uf2
+ruby $bin2uf2 image.bin $out/$name.uf2
