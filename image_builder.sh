@@ -33,7 +33,7 @@ To get started with the $board_name, please visit our website:<br><br>
 END
 
 # Copy the files into the file system.
-faketime $date mcopy -i files.bin files/* ::
+faketime $date mcopy -i files.bin -s files/* ::
 
 cat base.bin files.bin > image.bin
 
