@@ -17,9 +17,9 @@ let
   pkgs = nixpkgs {};
 
   example_code = fetchGit {
-    url = "${builtins.getEnv "POLOLU_VCS"}pololu-3pi-plus-2040-robot-example-code";
+    url = "git@github.com:pololu/pololu-3pi-plus-2040-robot";
     ref = "master";
-    rev = "4ca21e43079fafd4451f48f510b7c525e649049c";  # 2023-03-01
+    rev = "f4d96e5c73e8e259206c3a4c91c92c6da493accf";  # 2023-03-01
   };
 
   base = pkgs.stdenv.mkDerivation rec {
