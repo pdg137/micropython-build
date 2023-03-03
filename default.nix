@@ -2,7 +2,7 @@ let
   # This date is used to identify releases.  It gets baked into the filenames,
   # file system timestamps, and `sys.version` in Python.  Update it when
   # making a new release.
-  date = "2023-03-01";
+  date = "2023-03-02";
 
   short_date = (builtins.substring 2 2 date) +
     (builtins.substring 5 2 date) + (builtins.substring 8 2 date);
@@ -17,28 +17,28 @@ let
   pkgs = nixpkgs {};
 
   example_code = fetchGit {
-    url = "git@github.com:pololu/pololu-3pi-plus-2040-robot";
+    url = "git@github.com:pololu/pololu-3pi-2040-robot";
     ref = "master";
-    rev = "f4d96e5c73e8e259206c3a4c91c92c6da493accf";  # 2023-03-01
+    rev = "a65580998e9ffee5881b6d3c787ce3086d42b038";  # 2023-03-02
   };
 
   base = pkgs.stdenv.mkDerivation rec {
     name = "micropython-base" + name_suffix;
-    name_suffix = "-pololu-3pi+-2040-robot-${version}-${short_date}";
+    name_suffix = "-pololu-3pi-2040-robot-${version}-${short_date}";
 
     inherit date;
 
     src = pkgs.fetchFromGitHub {
       owner = "pdg137";  # TODO: move to pololu
       repo = "micropython";
-      rev = "e0c100cba74d0bb821a2ec9f43f14e7167a00042";  # 3pi+ branch, 2023-02-28
-      hash = "sha256-KDpvsOnIufB1g/B47NbBVBrNNYZSv0mXzOFgTUQkti8=";
+      rev = "c9526d9d6e3e8c78f9267c4a52f41959e476b5cb";  # 3pi+ branch, 2023-03-02
+      hash = "sha256-0vs7TjcQ1XPffDz2G0TqKLUwiy3wqCbq5Lul/1R4jB8=";
     };
 
     # After changing the micropython version, run
     # 'git describe --tags' to get the new values for these:
     version = "v1.19.1";
-    version_suffix = "-901";
+    version_suffix = "-902";
     MICROPY_GIT_TAG = version + version_suffix + "-g" + MICROPY_GIT_HASH;
     MICROPY_GIT_HASH = builtins.substring 0 9 src.rev;
 
@@ -64,8 +64,8 @@ let
     lib_pico_sdk = pkgs.fetchFromGitHub {
       owner = "pdg137";  # TODO: move to pololu
       repo = "pico-sdk";
-      rev = "48c7f53957e6a249425d4778d926ccd6c981bf42";
-      hash = "sha256-NgAsatPA+KEMOawgimphjHnw5EyrpcIrY8MKUDl0a9k=";
+      rev = "61d5b1a2105b966c59b7da92e826aac972ea3add";
+      hash = "sha256-nRtVjnotbmApCb1U/s8N0kQixLArPs90zHRWQ7BlckU=";
     };
     lib_tinyusb = pkgs.fetchFromGitHub {
       owner = "hathach";
@@ -88,7 +88,7 @@ let
     MICROPY_BANNER_NAME_AND_VERSION =
       "MicroPython ${MICROPY_GIT_TAG} build ${build_git_tag}; with ulab ${ulab_git_tag}";
 
-    MICROPY_BOARD = "POLOLU_3PI+_2040_ROBOT";
+    MICROPY_BOARD = "POLOLU_3PI_2040_ROBOT";
 
     buildInputs = [ pkgs.cmake pkgs.gcc pkgs.gcc-arm-embedded pkgs.python3 ];
 
@@ -102,7 +102,7 @@ let
   image = pkgs.stdenv.mkDerivation {
     name = "micropython" + base.name_suffix;
     board_name = "Pololu 3pi+ 2040 Robot";
-    start_url = "https://www.pololu.com/3pi+/start";
+    start_url = "https://www.pololu.com/3pi/start";
     inherit date base example_code;
     bin2uf2 = ./bin2uf2.rb;
     buildInputs = [ pkgs.dosfstools pkgs.libfaketime pkgs.mtools pkgs.ruby ];
@@ -110,8 +110,8 @@ let
   };
 
 in rec {
-  pololu-3pi-plus-2040-robot = image // { inherit base; };
+  pololu-3pi-2040-robot = image // { inherit base; };
 
   # Aliases:
-  p3pi = pololu-3pi-plus-2040-robot;
+  p3pi = pololu-3pi-2040-robot;
 }

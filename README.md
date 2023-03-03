@@ -7,10 +7,10 @@ firmware images for the Pololu 3pi+ 2040 Robot.
 
 To build a combined UF2 file that contains both Micropython (compiled from source)
 and a filesystem with Pololu example code, install [Nix] and [Git] on a Linux machine,
-then navigate to this directory and run `./build.sh -A pololu-3pi-plus-2040-robot`.
+then navigate to this directory and run `./build.sh -A pololu-3pi-2040-robot`.
 
 You can also build Micropython itself without a filesystem by running
-`./build.sh -A pololu-3pi-plus-2040-robot.base`.
+`./build.sh -A pololu-3pi-2040-robot.base`.
 
 These builds are reproducible: if you build the firmware the same way on two
 different machines or at two different times, you should get the exact same result.
@@ -30,17 +30,17 @@ cd micropython
 # This part can go away once our changes are merged.
 git remote add pololu https://github.com/pololu/micropython.git
 git fetch pololu
-git checkout pololu/3pi+
+git checkout pololu/3pi
 
 make -C mpy-cross # build Python cross-compiler
 
 cd ports/rp2
-make BOARD=POLOLU_3PI+_2040_ROBOT submodules
-make BOARD=POLOLU_3PI+_2040_ROBOT clean
-make USER_C_MODULES=../../../ulab/code/micropython.cmake BOARD=POLOLU_3PI+_2040_ROBOT
+make BOARD=POLOLU_3PI_2040_ROBOT submodules
+make BOARD=POLOLU_3PI_2040_ROBOT clean
+make USER_C_MODULES=../../../ulab/code/micropython.cmake BOARD=POLOLU_3PI_2040_ROBOT
 ```
 
-There will now be a `firmware.uf2` file in the `build-POLOLU_3PI+_2040_ROBOT` directory
+There will now be a `firmware.uf2` file in the `build-POLOLU_3PI_2040_ROBOT` directory
 that you can use.  It will not contain a file system or example code for the robot.
 
 ## Acknowledgments
@@ -57,7 +57,7 @@ This project relies on the following third-party projects:
 
 It also incorporates example code written by Pololu:
 
-- [Pololu 3pi+ 2040 Robot Example Code](https://github.com/pololu/pololu-3pi-plus-2040-robot-example-code)
+- [Pololu 3pi+ 2040 Robot example code and libraries](https://github.com/pololu/pololu-3pi-2040-robot)
 
 [Git]: https://git-scm.com/
 [Nix]: https://github.com/nixos/nix
