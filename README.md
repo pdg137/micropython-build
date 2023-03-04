@@ -1,15 +1,15 @@
-# Micropython build scripts
+# MicroPython build scripts
 
 This repository contains code and instructions for building [MicroPython]
 firmware images for the Pololu 3pi+ 2040 Robot.
 
 ## Building with Nix
 
-To build a combined UF2 file that contains both Micropython (compiled from source)
+To build a combined UF2 file that contains both MicroPython (compiled from source)
 and a filesystem with Pololu example code, install [Nix] and [Git] on a Linux machine,
 then navigate to this directory and run `./build.sh -A pololu-3pi-2040-robot`.
 
-You can also build Micropython itself without a filesystem by running
+You can also build MicroPython itself without a filesystem by running
 `./build.sh -A pololu-3pi-2040-robot.base`.
 
 These builds are reproducible: if you build the firmware the same way on two

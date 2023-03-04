@@ -35,19 +35,19 @@ let
       hash = "sha256-0vs7TjcQ1XPffDz2G0TqKLUwiy3wqCbq5Lul/1R4jB8=";
     };
 
-    # After changing the micropython version, run
+    # After changing the MicroPython version above, run
     # 'git describe --tags --match=v*' to get the new values for these:
     version = "v1.19.1";
     version_suffix = "-902";
     MICROPY_GIT_TAG = version + version_suffix + "-g" + MICROPY_GIT_HASH;
     MICROPY_GIT_HASH = builtins.substring 0 9 src.rev;
 
-    # Submodules of micropython needed by the RP2 port.
+    # Submodules of MicroPython needed by the RP2 port.
     # We could try 'fetchSubmodules = true;' above but that would fetch lots of repositories
     # we don't need, and it won't work with submodules that come from private URLs.
     #
-    # After changing the Micropython version, get the info you need to update this by
-    # running in the Micropython repository:
+    # After changing the MicroPython version, get the info you need to update this by
+    # running in the MicroPython repository:
     #   cd ports/rp2 && make submodules && git submodule status --recursive | grep '^ '
     lib_mbedtls = pkgs.fetchFromGitHub {
       owner = "ARMmbed";
