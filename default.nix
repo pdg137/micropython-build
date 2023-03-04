@@ -2,7 +2,7 @@ let
   # This date is used to identify releases.  It gets baked into the filenames,
   # file system timestamps, and `sys.version` in Python.  Update it when
   # making a new release.
-  date = "2023-03-02";
+  date = "2023-03-03";
 
   short_date = (builtins.substring 2 2 date) +
     (builtins.substring 5 2 date) + (builtins.substring 8 2 date);
@@ -16,10 +16,11 @@ let
     "https://github.com/NixOS/nixpkgs/archive/170e39462b516bd1475ce9184f7bb93106d27c59.tar.gz");
   pkgs = nixpkgs {};
 
-  example_code = fetchGit {
-    url = "git@github.com:pololu/pololu-3pi-2040-robot";
-    ref = "master";
-    rev = "a65580998e9ffee5881b6d3c787ce3086d42b038";  # 2023-03-02
+  example_code = pkgs.fetchFromGitHub {
+    owner = "pololu";
+    repo = "pololu-3pi-2040-robot";
+    rev = "43eea2e90c30955ae514c690e1fb9e95b413b5e8";  # 2023-03-03
+    hash = "sha256-DXw2KT4tphCcmtZE5YSrrejjN6DCR2XtvMmoYkzWuFY=";
   };
 
   base = pkgs.stdenv.mkDerivation rec {

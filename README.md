@@ -57,7 +57,7 @@ This project relies on the following third-party projects:
 
 It also incorporates example code written by Pololu:
 
-- [Pololu 3pi+ 2040 Robot example code and libraries](https://github.com/pololu/pololu-3pi-2040-robot)
+- [3pi+ 2040 Robot Libraries and Example Code](https://github.com/pololu/pololu-3pi-2040-robot)
 
 [Git]: https://git-scm.com/
 [Nix]: https://github.com/nixos/nix
