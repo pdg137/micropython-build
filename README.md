@@ -24,11 +24,11 @@ can follow these steps on a Linux machine:
 sudo apt install git cmake make gcc gcc-arm-none-eabi python3 # for Debian/Ubuntu
 
 git clone https://github.com/v923z/micropython-ulab ulab
-git clone https://github.com/micropython/micropython.git
+git clone https://github.com/micropython/micropython
 cd micropython
 
 # This part can go away once our changes are merged.
-git remote add pololu https://github.com/pololu/micropython.git
+git remote add pololu https://github.com/pololu/micropython
 git fetch pololu
 git checkout pololu/3pi
 
