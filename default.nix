@@ -2,7 +2,7 @@ let
   # This date is used to identify releases.  It gets baked into the filenames,
   # file system timestamps, and `sys.version` in Python.  Update it when
   # making a new release.
-  date = "2023-03-03";
+  date = "2023-04-03";
 
   short_date = (builtins.substring 2 2 date) +
     (builtins.substring 5 2 date) + (builtins.substring 8 2 date);
@@ -19,8 +19,8 @@ let
   example_code = pkgs.fetchFromGitHub {
     owner = "pololu";
     repo = "pololu-3pi-2040-robot";
-    rev = "43eea2e90c30955ae514c690e1fb9e95b413b5e8";  # 2023-03-03
-    hash = "sha256-DXw2KT4tphCcmtZE5YSrrejjN6DCR2XtvMmoYkzWuFY=";
+    rev = "c81c49a8f588ef88c0a36164b085bd95bff44850";  # 2023-03-08
+    hash = "sha256-aSyOwxQdSawV7yFH7oDjvyWYzc1HpkD0a560YouaUyo=";
   };
 
   base = pkgs.stdenv.mkDerivation rec {
@@ -32,14 +32,14 @@ let
     src = pkgs.fetchFromGitHub {
       owner = "pololu";
       repo = "micropython";
-      rev = "c9526d9d6e3e8c78f9267c4a52f41959e476b5cb";  # 3pi branch, 2023-03-02
-      hash = "sha256-0vs7TjcQ1XPffDz2G0TqKLUwiy3wqCbq5Lul/1R4jB8=";
+      rev = "812bd56e107b5e6902e5e6075cbf2f93337f271c";  # 3pi_2 branch, 2023-04-04
+      hash = "sha256-TnbAVrJZjLqosAb4SUpqrm9J8g8MGlCOwxtrcpPFwBE=";
     };
 
     # After changing the MicroPython version above, run
     # 'git describe --tags --match=v*' to get the new values for these:
     version = "v1.19.1";
-    version_suffix = "-902";
+    version_suffix = "-967";
     MICROPY_GIT_TAG = version + version_suffix + "-g" + MICROPY_GIT_HASH;
     MICROPY_GIT_HASH = builtins.substring 0 9 src.rev;
 
@@ -63,10 +63,10 @@ let
       hash = "sha256-NRMbQJH4Fx9Bl8KEHQ1yzdvb6bRyLw9SC1xjURXy41I=";
     };
     lib_pico_sdk = pkgs.fetchFromGitHub {
-      owner = "pololu";
+      owner = "raspberrypi";
       repo = "pico-sdk";
-      rev = "61d5b1a2105b966c59b7da92e826aac972ea3add";
-      hash = "sha256-nRtVjnotbmApCb1U/s8N0kQixLArPs90zHRWQ7BlckU=";
+      rev = "f396d05f8252d4670d4ea05c8b7ac938ef0cd381";
+      hash = "sha256-p69go8KXQR21szPb+R1xuonyFj+ZJDunNeoU7M3zIsE=";
     };
     lib_tinyusb = pkgs.fetchFromGitHub {
       owner = "hathach";
@@ -78,13 +78,13 @@ let
     ulab_src = pkgs.fetchFromGitHub {
       owner = "v923z";
       repo = "micropython-ulab";
-      rev = "f2dd2230c4fdf1aa5c7a160782efdde18e8204bb";  # 2023-01-23
-      hash = "sha256-JxH1mpFJDxCKp/CXSsQVEqCmtRZiiEvnsm6eDbi3jwo=";
+      rev = "8585407df9b7a25aba19b6a6ac7136f577f3d1e6";  # 2023-03-03
+      hash = "sha256-F26l06uHxtkVKtt/juOlNolD57znSNRBBCImkIlCAYM=";
     };
 
     # After changing the ulab version, run
     # 'git describe --tags' to get the new value of this:
-    ulab_git_tag = "5.1.1-20-g" + builtins.substring 0 7 ulab_src.rev;
+    ulab_git_tag = "5.1.1-21-g" + builtins.substring 0 7 ulab_src.rev;
 
     MICROPY_BANNER_NAME_AND_VERSION =
       "MicroPython ${MICROPY_GIT_TAG} build ${build_git_tag}; with ulab ${ulab_git_tag}";
