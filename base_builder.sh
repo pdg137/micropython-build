@@ -7,6 +7,11 @@ cp --no-preserve=mode -r $src src
 cp src/LICENSE $out/licenses/LICENSE_micropython.txt
 cd src
 
+for patch in $patches; do
+  echo applying patch $patch
+  patch -p1 -i $patch
+done
+
 rmdir lib/mbedtls
 ln -s $lib_mbedtls lib/mbedtls
 cp lib/mbedtls/LICENSE $out/licenses/LICENSE_mbedtls.txt

@@ -2,7 +2,7 @@ let
   # This date is used to identify releases.  It gets baked into the filenames,
   # file system timestamps, and `sys.version` in Python.  Update it when
   # making a new release.
-  date = "2023-04-03";
+  date = "2023-04-04";
 
   short_date = (builtins.substring 2 2 date) +
     (builtins.substring 5 2 date) + (builtins.substring 8 2 date);
@@ -11,7 +11,7 @@ let
     builtins.throw "Be sure to use build.sh.  See README." else
     short_date + "-" + builtins.getEnv "COMMIT";
 
-  # 2022-12-14, nixos-22.11 branch
+  # nixos-22.11 branch, 2022-12-14
   nixpkgs = import (fetchTarball
     "https://github.com/NixOS/nixpkgs/archive/170e39462b516bd1475ce9184f7bb93106d27c59.tar.gz");
   pkgs = nixpkgs {};
@@ -30,16 +30,17 @@ let
     inherit date;
 
     src = pkgs.fetchFromGitHub {
-      owner = "pololu";
+      owner = "micropython";
       repo = "micropython";
-      rev = "812bd56e107b5e6902e5e6075cbf2f93337f271c";  # 3pi_2 branch, 2023-04-04
-      hash = "sha256-TnbAVrJZjLqosAb4SUpqrm9J8g8MGlCOwxtrcpPFwBE=";
+      rev = "f34af3e42e6e823f5fbff1f8e729fe14460ea4ca";  # master branch, 2023-04-04
+      hash = "sha256-abNrIF3GLA8dxML3PvZ78SwNVgYTeHr8Y9i6o2+6lKw=";
     };
+    patches = [ ./3pi_2040.patch ./boot.patch ];
 
     # After changing the MicroPython version above, run
     # 'git describe --tags --match=v*' to get the new values for these:
     version = "v1.19.1";
-    version_suffix = "-967";
+    version_suffix = "-1002";
     MICROPY_GIT_TAG = version + version_suffix + "-g" + MICROPY_GIT_HASH;
     MICROPY_GIT_HASH = builtins.substring 0 9 src.rev;
 
@@ -59,8 +60,8 @@ let
     lib_micropython_lib = pkgs.fetchFromGitHub {
       owner = "micropython";
       repo = "micropython-lib";
-      rev = "c1526d2d1eb68c4c3b0ff8940b012c98a80301f1";
-      hash = "sha256-NRMbQJH4Fx9Bl8KEHQ1yzdvb6bRyLw9SC1xjURXy41I=";
+      rev = "c8603192d1d142fdeb7f9578e000c9834669a082";
+      hash = "sha256-BYtZoElqYLqgtN+ymP1ta/FYqUQPBD9Bb79+HPqGKNk=";
     };
     lib_pico_sdk = pkgs.fetchFromGitHub {
       owner = "raspberrypi";

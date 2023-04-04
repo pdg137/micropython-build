@@ -1,0 +1,238 @@
+From 7116598b7f461684d08701142cb727687f339f53 Mon Sep 17 00:00:00 2001
+From: Paul Grayson <paul@pololu.com>
+Date: Tue, 4 Apr 2023 08:38:45 -0700
+Subject: [PATCH 1/2] rp2: Add support for Pololu 3pi+ 2040 Robot.
+
+---
+ .../boards/POLOLU_3PI_2040_ROBOT/board.json   | 16 +++++++++++++++
+ .../POLOLU_3PI_2040_ROBOT/mpconfigboard.cmake |  5 +++++
+ .../POLOLU_3PI_2040_ROBOT/mpconfigboard.h     | 18 +++++++++++++++++
+ .../pololu_3pi_2040_robot.h                   | 20 +++++++++++++++++++
+ 4 files changed, 59 insertions(+)
+ create mode 100644 ports/rp2/boards/POLOLU_3PI_2040_ROBOT/board.json
+ create mode 100644 ports/rp2/boards/POLOLU_3PI_2040_ROBOT/mpconfigboard.cmake
+ create mode 100644 ports/rp2/boards/POLOLU_3PI_2040_ROBOT/mpconfigboard.h
+ create mode 100644 ports/rp2/boards/POLOLU_3PI_2040_ROBOT/pololu_3pi_2040_robot.h
+
+diff --git a/ports/rp2/boards/POLOLU_3PI_2040_ROBOT/board.json b/ports/rp2/boards/POLOLU_3PI_2040_ROBOT/board.json
+new file mode 100644
+index 000000000..83e012d93
+--- /dev/null
++++ b/ports/rp2/boards/POLOLU_3PI_2040_ROBOT/board.json
+@@ -0,0 +1,16 @@
++{
++    "deploy": [
++        "../deploy.md"
++    ],
++    "docs": "",
++    "features": [
++        "USB-C"
++    ],
++    "images": [
++    ],
++    "mcu": "rp2040",
++    "product": "Pololu 3pi+ 2040 Robot",
++    "thumbnail": "",
++    "url": "https://www.pololu.com/3pi",
++    "vendor": "Pololu"
++}
+diff --git a/ports/rp2/boards/POLOLU_3PI_2040_ROBOT/mpconfigboard.cmake b/ports/rp2/boards/POLOLU_3PI_2040_ROBOT/mpconfigboard.cmake
+new file mode 100644
+index 000000000..d9f118b73
+--- /dev/null
++++ b/ports/rp2/boards/POLOLU_3PI_2040_ROBOT/mpconfigboard.cmake
+@@ -0,0 +1,5 @@
++# cmake file for Pololu 3pi+ 2040 Robot
++
++# This board is not yet in upstream pico-sdk, so define it here
++# See also: https://github.com/raspberrypi/pico-sdk/tree/master/src/boards/include/boards
++list(APPEND PICO_BOARD_HEADER_DIRS ${MICROPY_BOARD_DIR})
+diff --git a/ports/rp2/boards/POLOLU_3PI_2040_ROBOT/mpconfigboard.h b/ports/rp2/boards/POLOLU_3PI_2040_ROBOT/mpconfigboard.h
+new file mode 100644
+index 000000000..917f828e5
+--- /dev/null
++++ b/ports/rp2/boards/POLOLU_3PI_2040_ROBOT/mpconfigboard.h
+@@ -0,0 +1,18 @@
++#pragma once
++
++// Board and hardware specific configuration
++#define MICROPY_HW_BOARD_NAME                   "Pololu 3pi+ 2040 Robot"
++#define MICROPY_HW_FLASH_STORAGE_BYTES          (15 * 1024 * 1024)
++
++#define MICROPY_HW_USB_MSC (1)
++#define MICROPY_HW_USB_VID (0x1FFB)
++#define MICROPY_HW_USB_PID (0x2043)
++#define MICROPY_HW_USB_DESC_STR_MAX (40)
++#define MICROPY_HW_USB_MANUFACTURER_STRING "Pololu Corporation"
++#define MICROPY_HW_USB_PRODUCT_FS_STRING MICROPY_HW_BOARD_NAME " MicroPython"
++
++#define MICROPY_BANNER_MACHINE MICROPY_HW_BOARD_NAME
++
++#define MICROPY_HW_I2C_NO_DEFAULT_PINS (1)
++#define MICROPY_HW_SPI_NO_DEFAULT_PINS (1)
++#define MICROPY_HW_UART_NO_DEFAULT_PINS (1)
+diff --git a/ports/rp2/boards/POLOLU_3PI_2040_ROBOT/pololu_3pi_2040_robot.h b/ports/rp2/boards/POLOLU_3PI_2040_ROBOT/pololu_3pi_2040_robot.h
+new file mode 100644
+index 000000000..75814547c
+--- /dev/null
++++ b/ports/rp2/boards/POLOLU_3PI_2040_ROBOT/pololu_3pi_2040_robot.h
+@@ -0,0 +1,20 @@
++// -----------------------------------------------------
++// NOTE: THIS HEADER IS ALSO INCLUDED BY ASSEMBLER SO
++//       SHOULD ONLY CONSIST OF PREPROCESSOR DIRECTIVES
++// -----------------------------------------------------
++
++#ifndef _POLOLU_3PI_2040_ROBOT_H
++#define _POLOLU_3PI_2040_ROBOT_H
++
++// For board detection
++#define POLOLU_3PI_2040_ROBOT
++
++#define PICO_DEFAULT_LED_PIN 25
++#define PICO_BOOT_STAGE2_CHOOSE_W25Q080 1
++#define PICO_FLASH_SPI_CLKDIV 2
++#define PICO_FLASH_SIZE_BYTES (16 * 1024 * 1024)
++
++// All boards have at least the B1 revision
++#define PICO_RP2040_B0_SUPPORTED 0
++
++#endif
+-- 
+GitLab
+
+
+From 765234b71d68c96b649f654b2c5d37c90001cf50 Mon Sep 17 00:00:00 2001
+From: Paul Grayson <paul@pololu.com>
+Date: Tue, 4 Apr 2023 09:23:22 -0700
+Subject: [PATCH 2/2] rp2: Add new NO_DEFAULT_PINS config options for i2c, spi,
+ and uart.
+
+---
+ ports/rp2/machine_i2c.c  | 19 +++++++++++++++++--
+ ports/rp2/machine_spi.c  | 24 +++++++++++++++++++++---
+ ports/rp2/machine_uart.c | 12 ++++++++++--
+ 3 files changed, 48 insertions(+), 7 deletions(-)
+
+diff --git a/ports/rp2/machine_i2c.c b/ports/rp2/machine_i2c.c
+index 85d12c771..0dc2a280d 100644
+--- a/ports/rp2/machine_i2c.c
++++ b/ports/rp2/machine_i2c.c
+@@ -34,6 +34,20 @@
+ 
+ #define DEFAULT_I2C_FREQ (400000)
+ 
++#ifdef MICROPY_HW_I2C_NO_DEFAULT_PINS
++
++// With no default I2C, need to require the pin args.
++#define MICROPY_HW_I2C0_SCL (0)
++#define MICROPY_HW_I2C0_SDA (0)
++#define MICROPY_HW_I2C1_SCL (0)
++#define MICROPY_HW_I2C1_SDA (0)
++#define MICROPY_I2C_PINS_ARG_OPTS MP_ARG_REQUIRED
++
++#else
++
++// Most boards do not require pin args.
++#define MICROPY_I2C_PINS_ARG_OPTS 0
++
+ #ifndef MICROPY_HW_I2C0_SCL
+ #if PICO_DEFAULT_I2C == 0
+ #define MICROPY_HW_I2C0_SCL (PICO_DEFAULT_I2C_SCL_PIN)
+@@ -53,6 +67,7 @@
+ #define MICROPY_HW_I2C1_SDA (6)
+ #endif
+ #endif
++#endif
+ 
+ // SDA/SCL on even/odd pins, I2C0/I2C1 on even/odd pairs of pins.
+ #define IS_VALID_SCL(i2c, pin) (((pin) & 1) == 1 && (((pin) & 2) >> 1) == (i2c))
+@@ -83,8 +98,8 @@ mp_obj_t machine_i2c_make_new(const mp_obj_type_t *type, size_t n_args, size_t n
+     static const mp_arg_t allowed_args[] = {
+         { MP_QSTR_id, MP_ARG_REQUIRED | MP_ARG_OBJ },
+         { MP_QSTR_freq, MP_ARG_INT, {.u_int = DEFAULT_I2C_FREQ} },
+-        { MP_QSTR_scl, MP_ARG_KW_ONLY | MP_ARG_OBJ, {.u_rom_obj = MP_ROM_NONE} },
+-        { MP_QSTR_sda, MP_ARG_KW_ONLY | MP_ARG_OBJ, {.u_rom_obj = MP_ROM_NONE} },
++        { MP_QSTR_scl, MICROPY_I2C_PINS_ARG_OPTS | MP_ARG_KW_ONLY | MP_ARG_OBJ, {.u_rom_obj = MP_ROM_NONE} },
++        { MP_QSTR_sda, MICROPY_I2C_PINS_ARG_OPTS | MP_ARG_KW_ONLY | MP_ARG_OBJ, {.u_rom_obj = MP_ROM_NONE} },
+     };
+ 
+     // Parse args.
+diff --git a/ports/rp2/machine_spi.c b/ports/rp2/machine_spi.c
+index b2b879c9a..fade6a1da 100644
+--- a/ports/rp2/machine_spi.c
++++ b/ports/rp2/machine_spi.c
+@@ -39,6 +39,22 @@
+ #define DEFAULT_SPI_BITS        (8)
+ #define DEFAULT_SPI_FIRSTBIT    (SPI_MSB_FIRST)
+ 
++#ifdef MICROPY_HW_SPI_NO_DEFAULT_PINS
++
++// With no default SPI, need to require the pin args.
++#define MICROPY_HW_SPI0_SCK     (0)
++#define MICROPY_HW_SPI0_MOSI    (0)
++#define MICROPY_HW_SPI0_MISO    (0)
++#define MICROPY_HW_SPI1_SCK     (0)
++#define MICROPY_HW_SPI1_MOSI    (0)
++#define MICROPY_HW_SPI1_MISO    (0)
++#define MICROPY_SPI_PINS_ARG_OPTS MP_ARG_REQUIRED
++
++#else
++
++// Most boards do not require pin args.
++#define MICROPY_SPI_PINS_ARG_OPTS 0
++
+ #ifndef MICROPY_HW_SPI0_SCK
+ #if PICO_DEFAULT_SPI == 0
+ #define MICROPY_HW_SPI0_SCK     (PICO_DEFAULT_SPI_SCK_PIN)
+@@ -63,6 +79,8 @@
+ #endif
+ #endif
+ 
++#endif
++
+ // SPI0 can be GP{0..7,16..23}, SPI1 can be GP{8..15,24..29}.
+ #define IS_VALID_PERIPH(spi, pin)   ((((pin) & 8) >> 3) == (spi))
+ // GP{2,6,10,14,...}
+@@ -117,9 +135,9 @@ mp_obj_t machine_spi_make_new(const mp_obj_type_t *type, size_t n_args, size_t n
+         { MP_QSTR_phase,    MP_ARG_KW_ONLY | MP_ARG_INT, {.u_int = DEFAULT_SPI_PHASE} },
+         { MP_QSTR_bits,     MP_ARG_KW_ONLY | MP_ARG_INT, {.u_int = DEFAULT_SPI_BITS} },
+         { MP_QSTR_firstbit, MP_ARG_KW_ONLY | MP_ARG_INT, {.u_int = DEFAULT_SPI_FIRSTBIT} },
+-        { MP_QSTR_sck,      MP_ARG_KW_ONLY | MP_ARG_OBJ, {.u_rom_obj = MP_ROM_NONE} },
+-        { MP_QSTR_mosi,     MP_ARG_KW_ONLY | MP_ARG_OBJ, {.u_rom_obj = MP_ROM_NONE} },
+-        { MP_QSTR_miso,     MP_ARG_KW_ONLY | MP_ARG_OBJ, {.u_rom_obj = MP_ROM_NONE} },
++        { MP_QSTR_sck,      MICROPY_SPI_PINS_ARG_OPTS | MP_ARG_KW_ONLY | MP_ARG_OBJ, {.u_rom_obj = MP_ROM_NONE} },
++        { MP_QSTR_mosi,     MICROPY_SPI_PINS_ARG_OPTS | MP_ARG_KW_ONLY | MP_ARG_OBJ, {.u_rom_obj = MP_ROM_NONE} },
++        { MP_QSTR_miso,     MICROPY_SPI_PINS_ARG_OPTS | MP_ARG_KW_ONLY | MP_ARG_OBJ, {.u_rom_obj = MP_ROM_NONE} },
+     };
+ 
+     // Parse the arguments.
+diff --git a/ports/rp2/machine_uart.c b/ports/rp2/machine_uart.c
+index 09870e78f..dade61b0b 100644
+--- a/ports/rp2/machine_uart.c
++++ b/ports/rp2/machine_uart.c
+@@ -40,6 +40,14 @@
+ #define DEFAULT_UART_BITS (8)
+ #define DEFAULT_UART_STOP (1)
+ 
++#ifdef MICROPY_HW_UART_NO_DEFAULT_PINS
++// With no default I2C, need to require the pin args.
++#define MICROPY_UART_PINS_ARG_OPTS MP_ARG_REQUIRED
++#else
++// Most boards do not require pin args.
++#define MICROPY_UART_PINS_ARG_OPTS 0
++#endif
++
+ // UART 0 default pins
+ #if !defined(MICROPY_HW_UART0_TX)
+ #define MICROPY_HW_UART0_TX (0)
+@@ -200,8 +208,8 @@ STATIC void machine_uart_init_helper(machine_uart_obj_t *self, size_t n_args, co
+         { MP_QSTR_bits, MP_ARG_INT, {.u_int = -1} },
+         { MP_QSTR_parity, MP_ARG_OBJ, {.u_rom_obj = MP_ROM_INT(-1)} },
+         { MP_QSTR_stop, MP_ARG_INT, {.u_int = -1} },
+-        { MP_QSTR_tx, MP_ARG_KW_ONLY | MP_ARG_OBJ, {.u_rom_obj = MP_ROM_NONE} },
+-        { MP_QSTR_rx, MP_ARG_KW_ONLY | MP_ARG_OBJ, {.u_rom_obj = MP_ROM_NONE} },
++        { MP_QSTR_tx, MICROPY_UART_PINS_ARG_OPTS | MP_ARG_KW_ONLY | MP_ARG_OBJ, {.u_rom_obj = MP_ROM_NONE} },
++        { MP_QSTR_rx, MICROPY_UART_PINS_ARG_OPTS | MP_ARG_KW_ONLY | MP_ARG_OBJ, {.u_rom_obj = MP_ROM_NONE} },
+         { MP_QSTR_cts, MP_ARG_KW_ONLY | MP_ARG_OBJ, {.u_rom_obj = MP_ROM_NONE} },
+         { MP_QSTR_rts, MP_ARG_KW_ONLY | MP_ARG_OBJ, {.u_rom_obj = MP_ROM_NONE} },
+         { MP_QSTR_timeout, MP_ARG_KW_ONLY | MP_ARG_INT, {.u_int = -1} },

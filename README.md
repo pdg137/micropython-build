@@ -28,9 +28,7 @@ git clone https://github.com/micropython/micropython
 cd micropython
 
 # This part can go away once our changes are merged.
-git remote add pololu https://github.com/pololu/micropython
-git fetch pololu
-git checkout pololu/3pi
+git pull --no-rebase https://github.com/pololu/micropython 3pi-230404 boot-230404
 
 make -C mpy-cross # build Python cross-compiler
 

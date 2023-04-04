@@ -1,0 +1,252 @@
+https://github.com/micropython/micropython/pull/10833.patch
+
+From 9f0d3163dd349f0a24582fd8265dfad550d723ab Mon Sep 17 00:00:00 2001
+From: David Grayson <davidegrayson@gmail.com>
+Date: Tue, 4 Apr 2023 12:05:45 -0700
+Subject: [PATCH] shared: Do not allow Ctrl+C to interrupt frozen boot code.
+
+Helps prevent the file system from getting formatted by mistake.
+
+Signed-off-by: David Grayson <davidegrayson@gmail.com>
+---
+ ports/esp32/main.c      |  2 +-
+ ports/esp8266/main.c    |  2 +-
+ ports/mimxrt/main.c     |  2 +-
+ ports/minimal/main.c    |  2 +-
+ ports/nrf/main.c        |  2 +-
+ ports/powerpc/main.c    |  2 +-
+ ports/renesas-ra/main.c |  2 +-
+ ports/rp2/main.c        |  4 ++--
+ ports/samd/main.c       |  2 +-
+ ports/stm32/main.c      |  2 +-
+ ports/teensy/main.c     |  4 ++--
+ shared/runtime/pyexec.c | 15 ++++++++++-----
+ shared/runtime/pyexec.h |  2 +-
+ 13 files changed, 24 insertions(+), 19 deletions(-)
+
+diff --git a/ports/esp32/main.c b/ports/esp32/main.c
+index e2a803fcb621..e7d7626a6e2b 100644
+--- a/ports/esp32/main.c
++++ b/ports/esp32/main.c
+@@ -161,7 +161,7 @@ void mp_task(void *pvParameter) {
+     #endif
+ 
+     // run boot-up scripts
+-    pyexec_frozen_module("_boot.py");
++    pyexec_frozen_module("_boot.py", false);
+     pyexec_file_if_exists("boot.py");
+     if (pyexec_mode_kind == PYEXEC_MODE_FRIENDLY_REPL) {
+         int ret = pyexec_file_if_exists("main.py");
+diff --git a/ports/esp8266/main.c b/ports/esp8266/main.c
+index 583540a81c76..238490ebefe9 100644
+--- a/ports/esp8266/main.c
++++ b/ports/esp8266/main.c
+@@ -74,7 +74,7 @@ STATIC void mp_reset(void) {
+     }
+ 
+     #if MICROPY_MODULE_FROZEN
+-    pyexec_frozen_module("_boot.py");
++    pyexec_frozen_module("_boot.py", false);
+     pyexec_file_if_exists("boot.py");
+     if (pyexec_mode_kind == PYEXEC_MODE_FRIENDLY_REPL) {
+         pyexec_file_if_exists("main.py");
+diff --git a/ports/mimxrt/main.c b/ports/mimxrt/main.c
+index 907de373dee6..1a85f21c6d13 100644
+--- a/ports/mimxrt/main.c
++++ b/ports/mimxrt/main.c
+@@ -85,7 +85,7 @@ int main(void) {
+         readline_init0();
+ 
+         // Execute _boot.py to set up the filesystem.
+-        pyexec_frozen_module("_boot.py");
++        pyexec_frozen_module("_boot.py", false);
+ 
+         // Execute user scripts.
+         int ret = pyexec_file_if_exists("boot.py");
+diff --git a/ports/minimal/main.c b/ports/minimal/main.c
+index 4eb6ca65af0d..499099753184 100644
+--- a/ports/minimal/main.c
++++ b/ports/minimal/main.c
+@@ -55,7 +55,7 @@ int main(int argc, char **argv) {
+     // do_str("print('hello world!', list(x+1 for x in range(10)), end='eol\\n')", MP_PARSE_SINGLE_INPUT);
+     // do_str("for i in range(10):\r\n  print(i)", MP_PARSE_FILE_INPUT);
+     #else
+-    pyexec_frozen_module("frozentest.py");
++    pyexec_frozen_module("frozentest.py", false);
+     #endif
+     mp_deinit();
+     return 0;
+diff --git a/ports/nrf/main.c b/ports/nrf/main.c
+index 197fea9ab640..f64107f8907f 100644
+--- a/ports/nrf/main.c
++++ b/ports/nrf/main.c
+@@ -184,7 +184,7 @@ int main(int argc, char **argv) {
+     int ret = mp_vfs_mount_and_chdir_protected((mp_obj_t)&nrf_flash_obj, mount_point);
+ 
+     if ((ret == -MP_ENODEV) || (ret == -MP_EIO)) {
+-        pyexec_frozen_module("_mkfs.py"); // Frozen script for formatting flash filesystem.
++        pyexec_frozen_module("_mkfs.py", false); // Frozen script for formatting flash filesystem.
+         ret = mp_vfs_mount_and_chdir_protected((mp_obj_t)&nrf_flash_obj, mount_point);
+     }
+ 
+diff --git a/ports/powerpc/main.c b/ports/powerpc/main.c
+index 11013f175530..f3abc64aa739 100644
+--- a/ports/powerpc/main.c
++++ b/ports/powerpc/main.c
+@@ -95,7 +95,7 @@ int main(int argc, char **argv) {
+     pyexec_friendly_repl();
+     #endif
+     #else
+-    pyexec_frozen_module("frozentest.py");
++    pyexec_frozen_module("frozentest.py", false);
+     #endif
+     mp_deinit();
+     return 0;
+diff --git a/ports/renesas-ra/main.c b/ports/renesas-ra/main.c
+index d403dbacbe43..6ba26cd7baba 100644
+--- a/ports/renesas-ra/main.c
++++ b/ports/renesas-ra/main.c
+@@ -325,7 +325,7 @@ void ra_main(uint32_t reset_mode) {
+ 
+     // Run optional frozen boot code.
+     #ifdef MICROPY_BOARD_FROZEN_BOOT_FILE
+-    pyexec_frozen_module(MICROPY_BOARD_FROZEN_BOOT_FILE);
++    pyexec_frozen_module(MICROPY_BOARD_FROZEN_BOOT_FILE, false);
+     #endif
+ 
+     // Run boot.py (or whatever else a board configures at this stage).
+diff --git a/ports/rp2/main.c b/ports/rp2/main.c
+index 9e69d159e17e..059449695cb6 100644
+--- a/ports/rp2/main.c
++++ b/ports/rp2/main.c
+@@ -168,9 +168,9 @@ int main(int argc, char **argv) {
+ 
+         // Execute _boot.py to set up the filesystem.
+         #if MICROPY_VFS_FAT && MICROPY_HW_USB_MSC
+-        pyexec_frozen_module("_boot_fat.py");
++        pyexec_frozen_module("_boot_fat.py", false);
+         #else
+-        pyexec_frozen_module("_boot.py");
++        pyexec_frozen_module("_boot.py", false);
+         #endif
+ 
+         // Execute user scripts.
+diff --git a/ports/samd/main.c b/ports/samd/main.c
+index 725fd651d02c..bc0e45ee64db 100644
+--- a/ports/samd/main.c
++++ b/ports/samd/main.c
+@@ -52,7 +52,7 @@ void samd_main(void) {
+         readline_init0();
+ 
+         // Execute _boot.py to set up the filesystem.
+-        pyexec_frozen_module("_boot.py");
++        pyexec_frozen_module("_boot.py", false);
+ 
+         // Execute user scripts.
+         int ret = pyexec_file_if_exists("boot.py");
+diff --git a/ports/stm32/main.c b/ports/stm32/main.c
+index e5ad14fcf770..cc0367b824e0 100644
+--- a/ports/stm32/main.c
++++ b/ports/stm32/main.c
+@@ -559,7 +559,7 @@ void stm32_main(uint32_t reset_mode) {
+ 
+     // Run optional frozen boot code.
+     #ifdef MICROPY_BOARD_FROZEN_BOOT_FILE
+-    pyexec_frozen_module(MICROPY_BOARD_FROZEN_BOOT_FILE);
++    pyexec_frozen_module(MICROPY_BOARD_FROZEN_BOOT_FILE, false);
+     #endif
+ 
+     // Run boot.py (or whatever else a board configures at this stage).
+diff --git a/ports/teensy/main.c b/ports/teensy/main.c
+index 37a04c74f8af..fa27326e932d 100644
+--- a/ports/teensy/main.c
++++ b/ports/teensy/main.c
+@@ -298,7 +298,7 @@ int main(void) {
+     #endif
+ 
+     #if MICROPY_MODULE_FROZEN
+-    pyexec_frozen_module("boot.py");
++    pyexec_frozen_module("boot.py", false);
+     #else
+     if (!pyexec_file_if_exists("/boot.py")) {
+         flash_error(4);
+@@ -310,7 +310,7 @@ int main(void) {
+ 
+     // run main script
+     #if MICROPY_MODULE_FROZEN
+-    pyexec_frozen_module("main.py");
++    pyexec_frozen_module("main.py", true);
+     #else
+     {
+         vstr_t *vstr = vstr_new(16);
+diff --git a/shared/runtime/pyexec.c b/shared/runtime/pyexec.c
+index 40491650e421..ec0ff87f1d01 100644
+--- a/shared/runtime/pyexec.c
++++ b/shared/runtime/pyexec.c
+@@ -57,6 +57,7 @@ STATIC bool repl_display_debugging_info = 0;
+ #define EXEC_FLAG_SOURCE_IS_VSTR        (1 << 4)
+ #define EXEC_FLAG_SOURCE_IS_FILENAME    (1 << 5)
+ #define EXEC_FLAG_SOURCE_IS_READER      (1 << 6)
++#define EXEC_FLAG_NO_INTERRUPT          (1 << 7)
+ 
+ // parses, compiles and executes the code in the lexer
+ // frees the lexer before returning
+@@ -113,7 +114,9 @@ STATIC int parse_compile_execute(const void *source, mp_parse_input_kind_t input
+         }
+ 
+         // execute code
+-        mp_hal_set_interrupt_char(CHAR_CTRL_C); // allow ctrl-C to interrupt us
++        if (!(exec_flags & EXEC_FLAG_NO_INTERRUPT)) {
++            mp_hal_set_interrupt_char(CHAR_CTRL_C);
++        }
+         #if MICROPY_REPL_INFO
+         start = mp_hal_ticks_ms();
+         #endif
+@@ -686,7 +689,7 @@ int pyexec_file(const char *filename) {
+ int pyexec_file_if_exists(const char *filename) {
+     #if MICROPY_MODULE_FROZEN
+     if (mp_find_frozen_module(filename, NULL, NULL) == MP_IMPORT_STAT_FILE) {
+-        return pyexec_frozen_module(filename);
++        return pyexec_frozen_module(filename, true);
+     }
+     #endif
+     if (mp_import_stat(filename) != MP_IMPORT_STAT_FILE) {
+@@ -696,20 +699,22 @@ int pyexec_file_if_exists(const char *filename) {
+ }
+ 
+ #if MICROPY_MODULE_FROZEN
+-int pyexec_frozen_module(const char *name) {
++int pyexec_frozen_module(const char *name, bool allow_keyboard_interrupt) {
+     void *frozen_data;
+     int frozen_type;
+     mp_find_frozen_module(name, &frozen_type, &frozen_data);
++    mp_uint_t exec_flags = allow_keyboard_interrupt ? 0 : EXEC_FLAG_NO_INTERRUPT;
+ 
+     switch (frozen_type) {
+         #if MICROPY_MODULE_FROZEN_STR
+         case MP_FROZEN_STR:
+-            return parse_compile_execute(frozen_data, MP_PARSE_FILE_INPUT, 0);
++            return parse_compile_execute(frozen_data, MP_PARSE_FILE_INPUT, exec_flags);
+         #endif
+ 
+         #if MICROPY_MODULE_FROZEN_MPY
+         case MP_FROZEN_MPY:
+-            return parse_compile_execute(frozen_data, MP_PARSE_FILE_INPUT, EXEC_FLAG_SOURCE_IS_RAW_CODE);
++            return parse_compile_execute(frozen_data, MP_PARSE_FILE_INPUT, exec_flags |
++                EXEC_FLAG_SOURCE_IS_RAW_CODE);
+         #endif
+ 
+         default:
+diff --git a/shared/runtime/pyexec.h b/shared/runtime/pyexec.h
+index 981e7dca9fc6..64c5ef94340d 100644
+--- a/shared/runtime/pyexec.h
++++ b/shared/runtime/pyexec.h
+@@ -46,7 +46,7 @@ int pyexec_raw_repl(void);
+ int pyexec_friendly_repl(void);
+ int pyexec_file(const char *filename);
+ int pyexec_file_if_exists(const char *filename);
+-int pyexec_frozen_module(const char *name);
++int pyexec_frozen_module(const char *name, bool allow_keyboard_interrupt);
+ void pyexec_event_repl_init(void);
+ int pyexec_event_repl_process_char(int c);
+ extern uint8_t pyexec_repl_active;
