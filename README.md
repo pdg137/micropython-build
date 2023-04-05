@@ -23,12 +23,13 @@ can follow these steps on a Linux machine:
 ```text
 sudo apt install git cmake make gcc gcc-arm-none-eabi python3 # for Debian/Ubuntu
 
+git clone https://github.com/pololu/micropython-build
 git clone https://github.com/v923z/micropython-ulab ulab
 git clone https://github.com/micropython/micropython
 cd micropython
 
-# This part can go away once our changes are merged.
-git pull --no-rebase https://github.com/pololu/micropython 3pi-230404
+# This part can go away after our changes are merged.
+patch -p1 ../micropython-build/3pi_2040.patch
 
 make -C mpy-cross # build Python cross-compiler
 
