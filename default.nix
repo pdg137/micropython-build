@@ -1,8 +1,7 @@
 let
   # This date is used to identify releases.  It gets baked into the filenames,
-  # file system timestamps, and `sys.version` in Python.  Update it when
-  # making a new release.
-  date = "2023-04-04";
+  # file system timestamps, and `sys.version` in Python.
+  date = "2023-04-05";
 
   short_date = (builtins.substring 2 2 date) +
     (builtins.substring 5 2 date) + (builtins.substring 8 2 date);
@@ -32,15 +31,15 @@ let
     src = pkgs.fetchFromGitHub {
       owner = "micropython";
       repo = "micropython";
-      rev = "f34af3e42e6e823f5fbff1f8e729fe14460ea4ca";  # master branch, 2023-04-04
-      hash = "sha256-abNrIF3GLA8dxML3PvZ78SwNVgYTeHr8Y9i6o2+6lKw=";
+      rev = "c046b23ea29e0183c899a8dbe1da3bed3440a255";  # master branch, 2023-04-04
+      hash = "sha256-goEiILB0EiqodvC9MlvjoD7cb9QCBqJRUfkDuXCA1ss=";
     };
-    patches = [ ./3pi_2040.patch ./boot.patch ];
+    patches = [ ./3pi_2040.patch ];
 
     # After changing the MicroPython version above, run
     # 'git describe --tags --match=v*' to get the new values for these:
     version = "v1.19.1";
-    version_suffix = "-1002";
+    version_suffix = "-1008";
     MICROPY_GIT_TAG = version + version_suffix + "-g" + MICROPY_GIT_HASH;
     MICROPY_GIT_HASH = builtins.substring 0 9 src.rev;
 
