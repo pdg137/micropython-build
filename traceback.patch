@@ -1,0 +1,37 @@
+diff --git a/py/modsys.c b/py/modsys.c
+index 35af761a0..bbfeb60f2 100644
+--- a/py/modsys.c
++++ b/py/modsys.c
+@@ -150,6 +150,24 @@ STATIC mp_obj_t mp_sys_print_exception(size_t n_args, const mp_obj_t *args) {
+ }
+ MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(mp_sys_print_exception_obj, 1, 2, mp_sys_print_exception);
+ 
++STATIC mp_obj_t mp_sys_exc_traceback(mp_obj_t exc) {
++    size_t n, *values;
++    mp_obj_exception_get_traceback(exc, &n, &values);
++    mp_obj_t obj = mp_obj_new_list(n, (mp_obj_t *)values);
++    mp_obj_list_t * list = MP_OBJ_TO_PTR(obj);
++    for (size_t i = 0; i + 2 < list->len; i += 3)
++    {
++      // not sure how to convert the filename to a string
++      list->items[i + 0] = MP_OBJ_NEW_SMALL_INT(list->items[i + 0]);
++      // convert line number to a small int object
++      list->items[i + 1] = MP_OBJ_NEW_SMALL_INT(list->items[i + 1]);
++      // not sure what to do with the block
++      list->items[i + 2] = MP_OBJ_NEW_SMALL_INT(list->items[i + 2]);
++    }
++    return obj;
++}
++STATIC MP_DEFINE_CONST_FUN_OBJ_1(mp_sys_exc_traceback_obj, mp_sys_exc_traceback);
++
+ #if MICROPY_PY_SYS_EXC_INFO
+ STATIC mp_obj_t mp_sys_exc_info(void) {
+     mp_obj_t cur_exc = MP_OBJ_FROM_PTR(MP_STATE_VM(cur_exception));
+@@ -277,6 +295,7 @@ STATIC const mp_rom_map_elem_t mp_module_sys_globals_table[] = {
+      */
+ 
+     { MP_ROM_QSTR(MP_QSTR_print_exception), MP_ROM_PTR(&mp_sys_print_exception_obj) },
++    { MP_ROM_QSTR(MP_QSTR__exc_traceback), MP_ROM_PTR(&mp_sys_exc_traceback_obj) },
+     #if MICROPY_PY_SYS_ATEXIT
+     { MP_ROM_QSTR(MP_QSTR_atexit), MP_ROM_PTR(&mp_sys_atexit_obj) },
+     #endif

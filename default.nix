@@ -1,7 +1,7 @@
 let
   # This date is used to identify releases.  It gets baked into the filenames,
   # file system timestamps, and `sys.version` in Python.
-  date = "2023-04-05";
+  date = "2023-04-07";
 
   short_date = (builtins.substring 2 2 date) +
     (builtins.substring 5 2 date) + (builtins.substring 8 2 date);
@@ -34,7 +34,7 @@ let
       rev = "c046b23ea29e0183c899a8dbe1da3bed3440a255";  # master branch, 2023-04-04
       hash = "sha256-goEiILB0EiqodvC9MlvjoD7cb9QCBqJRUfkDuXCA1ss=";
     };
-    patches = [ ./3pi_2040.patch ];
+    patches = [ ./3pi_2040.patch ./traceback.patch ];
 
     # After changing the MicroPython version above, run
     # 'git describe --tags --match=v*' to get the new values for these:

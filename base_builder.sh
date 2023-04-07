@@ -31,6 +31,7 @@ cp lib/tinyusb/LICENSE $out/licenses/LICENSE_tinyusb.txt
 
 cat >> ports/rp2/boards/$MICROPY_BOARD/mpconfigboard.h <<END
 #define MICROPY_BANNER_NAME_AND_VERSION "$MICROPY_BANNER_NAME_AND_VERSION"
+#define MICROPY_PY_SYS_EXC_INFO 1
 END
 
 rm ports/rp2/modules/_boot.py
