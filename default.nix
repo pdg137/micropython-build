@@ -1,7 +1,7 @@
 let
   # This date is used to identify releases.  It gets baked into the filenames,
   # file system timestamps, and `sys.version` in Python.
-  date = "2023-04-07";
+  date = "2023-04-11";
 
   short_date = (builtins.substring 2 2 date) +
     (builtins.substring 5 2 date) + (builtins.substring 8 2 date);

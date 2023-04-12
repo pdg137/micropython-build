@@ -1,5 +1,21 @@
+From e7a799e31c0c01bfe9a2972fa456f80d4dc987b5 Mon Sep 17 00:00:00 2001
+From: "David (Pololu)" <dev-david@pololu.com>
+Date: Tue, 11 Apr 2023 16:40:05 -0700
+Subject: [PATCH] py/modsys.c: Add sys._exc_traceback.
+
+This makes it easier to provide custom formatting of exception
+stack traces, e.g. to make them fit on a tiny display.
+
+This is an experimental function that exposes internal details
+of MicroPython and it might change in the future.
+
+Signed-off-by: David (Pololu) <dev-david@pololu.com>
+---
+ py/modsys.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
+
 diff --git a/py/modsys.c b/py/modsys.c
-index 35af761a0..bbfeb60f2 100644
+index 35af761a08f..ab03aff95b7 100644
 --- a/py/modsys.c
 +++ b/py/modsys.c
 @@ -150,6 +150,24 @@ STATIC mp_obj_t mp_sys_print_exception(size_t n_args, const mp_obj_t *args) {
@@ -7,18 +23,18 @@ index 35af761a0..bbfeb60f2 100644
  MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(mp_sys_print_exception_obj, 1, 2, mp_sys_print_exception);
  
 +STATIC mp_obj_t mp_sys_exc_traceback(mp_obj_t exc) {
++    if (!mp_obj_is_exception_instance(exc)) {
++        mp_raise_TypeError(MP_ERROR_TEXT("not an exception"));
++    }
 +    size_t n, *values;
 +    mp_obj_exception_get_traceback(exc, &n, &values);
-+    mp_obj_t obj = mp_obj_new_list(n, (mp_obj_t *)values);
-+    mp_obj_list_t * list = MP_OBJ_TO_PTR(obj);
-+    for (size_t i = 0; i + 2 < list->len; i += 3)
-+    {
-+      // not sure how to convert the filename to a string
-+      list->items[i + 0] = MP_OBJ_NEW_SMALL_INT(list->items[i + 0]);
-+      // convert line number to a small int object
-+      list->items[i + 1] = MP_OBJ_NEW_SMALL_INT(list->items[i + 1]);
-+      // not sure what to do with the block
-+      list->items[i + 2] = MP_OBJ_NEW_SMALL_INT(list->items[i + 2]);
++    // Assumption: n is a multiple of 3.
++    mp_obj_t obj = mp_obj_new_list(n, NULL);
++    mp_obj_list_t *list = MP_OBJ_TO_PTR(obj);
++    for (size_t i = 0; i < list->len; i += 3) {
++        list->items[i + 0] = MP_OBJ_NEW_QSTR(values[i + 0]);       // filename
++        list->items[i + 1] = MP_OBJ_NEW_SMALL_INT(values[i + 1]);  // line
++        list->items[i + 2] = MP_OBJ_NEW_QSTR(values[i + 2]);       // block
 +    }
 +    return obj;
 +}
