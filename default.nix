@@ -1,7 +1,7 @@
 let
   # This date is used to identify releases.  It gets baked into the filenames,
   # file system timestamps, and `sys.version` in Python.
-  date = "2023-04-13";
+  date = "2023-04-28";
 
   short_date = (builtins.substring 2 2 date) +
     (builtins.substring 5 2 date) + (builtins.substring 8 2 date);
@@ -18,8 +18,8 @@ let
   example_code = pkgs.fetchFromGitHub {
     owner = "pololu";
     repo = "pololu-3pi-2040-robot";
-    rev = "c81c49a8f588ef88c0a36164b085bd95bff44850";  # 2023-03-08
-    hash = "sha256-aSyOwxQdSawV7yFH7oDjvyWYzc1HpkD0a560YouaUyo=";
+    rev = "63e9b05c3a7b12d7721cd0b9e2883a379c88d285";  # 2023-04-27
+    hash = "sha256-qoWMnt0gbXQHYEud5Ze8rT2TC6kDhgJmLz9W28Flxjo=";
   };
 
   base = pkgs.stdenv.mkDerivation rec {
@@ -31,15 +31,15 @@ let
     src = pkgs.fetchFromGitHub {
       owner = "micropython";
       repo = "micropython";
-      rev = "c046b23ea29e0183c899a8dbe1da3bed3440a255";  # master branch, 2023-04-04
-      hash = "sha256-goEiILB0EiqodvC9MlvjoD7cb9QCBqJRUfkDuXCA1ss=";
+      rev = "867e4dd3dc9235974974fd5dab204371616d6f49";  # master branch, 2023-04-04
+      hash = "sha256-njvG1XfAwfVOCYE4O7lwGWgtmQanqMhdTlDSAEdVhOA=";
     };
-    patches = [ ./pr_merged.patch ./traceback.patch ];
+    patches = [ ./3pi.patch ./traceback.patch ];
 
     # After changing the MicroPython version above, run
     # 'git describe --tags --match=v*' to get the new values for these:
-    version = "v1.19.1";
-    version_suffix = "-1008";
+    version = "v1.20.0";
+    version_suffix = "-24";
     MICROPY_GIT_TAG = version + version_suffix + "-g" + MICROPY_GIT_HASH;
     MICROPY_GIT_HASH = builtins.substring 0 9 src.rev;
 
@@ -59,8 +59,8 @@ let
     lib_micropython_lib = pkgs.fetchFromGitHub {
       owner = "micropython";
       repo = "micropython-lib";
-      rev = "c8603192d1d142fdeb7f9578e000c9834669a082";
-      hash = "sha256-BYtZoElqYLqgtN+ymP1ta/FYqUQPBD9Bb79+HPqGKNk=";
+      rev = "c113611765278b2fc8dcf8b2f2c3513b35a69b39";
+      hash = "sha256-Bh21HxOUVdFbbtAPTr3I5krhS5kIqBbMleUCodg3hBo=";
     };
     lib_pico_sdk = pkgs.fetchFromGitHub {
       owner = "raspberrypi";
@@ -78,13 +78,13 @@ let
     ulab_src = pkgs.fetchFromGitHub {
       owner = "v923z";
       repo = "micropython-ulab";
-      rev = "8585407df9b7a25aba19b6a6ac7136f577f3d1e6";  # 2023-03-03
-      hash = "sha256-F26l06uHxtkVKtt/juOlNolD57znSNRBBCImkIlCAYM=";
+      rev = "8c3e1058d441c2d075febadc8b7993b03e152bf9";  # 2023-03-03
+      hash = "sha256-gbZFgCdbtr4oxSAfGONJpSJm4k3u8QGSOlM3iOkT9tI=";
     };
 
     # After changing the ulab version, run
     # 'git describe --tags' to get the new value of this:
-    ulab_git_tag = "5.1.1-21-g" + builtins.substring 0 7 ulab_src.rev;
+    ulab_git_tag = "5.1.1-27-g" + builtins.substring 0 7 ulab_src.rev;
 
     MICROPY_BANNER_NAME_AND_VERSION =
       "MicroPython ${MICROPY_GIT_TAG} build ${build_git_tag}; with ulab ${ulab_git_tag}";
@@ -110,8 +110,18 @@ let
     builder = ./image_builder.sh;
   };
 
+  # Run this to avoid having useful things garbage collected:
+  #   nix-build -A gcroots --out-link gcroots
+  gcroots = pkgs.mkShell {
+    buildInputs = base.buildInputs ++ image.buildInputs;
+    inherit example_code;
+    inherit (base) src lib_mbedtls lib_micropython_lib lib_pico_sdk lib_tinyusb ulab_src;
+  };
+
 in rec {
   pololu-3pi-2040-robot = image // { inherit base; };
+
+  inherit gcroots;
 
   # Aliases:
   p3pi = pololu-3pi-2040-robot;

@@ -1,45 +1,25 @@
-Merge of:
-- 765234b from pdg137/3pi+
-- 45ce22d from pololu/pr_rp2_i2c_timeout
+https://github.com/micropython/micropython/pull/10909.patch
 
-diff --git a/docs/library/machine.I2C.rst b/docs/library/machine.I2C.rst
-index 0eb1b67f5..bfc9f7ebc 100644
---- a/docs/library/machine.I2C.rst
-+++ b/docs/library/machine.I2C.rst
-@@ -52,7 +52,7 @@ Example usage::
- Constructors
- ------------
- 
--.. class:: I2C(id, *, scl, sda, freq=400000)
-+.. class:: I2C(id, *, scl, sda, freq=400000, timeout=50000)
- 
-    Construct and return a new I2C object using the following parameters:
- 
-@@ -62,6 +62,8 @@ Constructors
-       - *sda* should be a pin object specifying the pin to use for SDA.
-       - *freq* should be an integer which sets the maximum frequency
-         for SCL.
-+      - *timeout* is the maximum time in microseconds to allow for I2C
-+        transactions.  This parameter is not allowed on some ports.
- 
-    Note that some ports/boards will have default values of *scl* and *sda*
-    that can be changed in this constructor.  Others will have fixed values
-diff --git a/ports/esp32/machine_i2c.c b/ports/esp32/machine_i2c.c
-index c805dab87..9ec39e564 100644
---- a/ports/esp32/machine_i2c.c
-+++ b/ports/esp32/machine_i2c.c
-@@ -62,7 +62,7 @@
- #error "unsupported I2C for ESP32 SoC variant"
- #endif
- 
--#define I2C_DEFAULT_TIMEOUT_US (10000) // 10ms
-+#define I2C_DEFAULT_TIMEOUT_US (50000) // 50ms
- 
- typedef struct _machine_hw_i2c_obj_t {
-     mp_obj_base_t base;
+From bad5876f5c0875bb0f07f08708a0235a49c21741 Mon Sep 17 00:00:00 2001
+From: Paul Grayson <paul@pololu.com>
+Date: Tue, 4 Apr 2023 08:38:45 -0700
+Subject: [PATCH 1/2] rp2: Add support for Pololu 3pi+ 2040 Robot.
+
+Signed-off-by: Paul Grayson <paul@pololu.com>
+---
+ .../boards/POLOLU_3PI_2040_ROBOT/board.json   | 16 +++++++++++++++
+ .../POLOLU_3PI_2040_ROBOT/mpconfigboard.cmake |  5 +++++
+ .../POLOLU_3PI_2040_ROBOT/mpconfigboard.h     | 18 +++++++++++++++++
+ .../pololu_3pi_2040_robot.h                   | 20 +++++++++++++++++++
+ 4 files changed, 59 insertions(+)
+ create mode 100644 ports/rp2/boards/POLOLU_3PI_2040_ROBOT/board.json
+ create mode 100644 ports/rp2/boards/POLOLU_3PI_2040_ROBOT/mpconfigboard.cmake
+ create mode 100644 ports/rp2/boards/POLOLU_3PI_2040_ROBOT/mpconfigboard.h
+ create mode 100644 ports/rp2/boards/POLOLU_3PI_2040_ROBOT/pololu_3pi_2040_robot.h
+
 diff --git a/ports/rp2/boards/POLOLU_3PI_2040_ROBOT/board.json b/ports/rp2/boards/POLOLU_3PI_2040_ROBOT/board.json
 new file mode 100644
-index 000000000..83e012d93
+index 000000000000..83e012d933e4
 --- /dev/null
 +++ b/ports/rp2/boards/POLOLU_3PI_2040_ROBOT/board.json
 @@ -0,0 +1,16 @@
@@ -61,7 +41,7 @@ index 000000000..83e012d93
 +}
 diff --git a/ports/rp2/boards/POLOLU_3PI_2040_ROBOT/mpconfigboard.cmake b/ports/rp2/boards/POLOLU_3PI_2040_ROBOT/mpconfigboard.cmake
 new file mode 100644
-index 000000000..d9f118b73
+index 000000000000..d9f118b73d26
 --- /dev/null
 +++ b/ports/rp2/boards/POLOLU_3PI_2040_ROBOT/mpconfigboard.cmake
 @@ -0,0 +1,5 @@
@@ -72,7 +52,7 @@ index 000000000..d9f118b73
 +list(APPEND PICO_BOARD_HEADER_DIRS ${MICROPY_BOARD_DIR})
 diff --git a/ports/rp2/boards/POLOLU_3PI_2040_ROBOT/mpconfigboard.h b/ports/rp2/boards/POLOLU_3PI_2040_ROBOT/mpconfigboard.h
 new file mode 100644
-index 000000000..917f828e5
+index 000000000000..917f828e5817
 --- /dev/null
 +++ b/ports/rp2/boards/POLOLU_3PI_2040_ROBOT/mpconfigboard.h
 @@ -0,0 +1,18 @@
@@ -96,7 +76,7 @@ index 000000000..917f828e5
 +#define MICROPY_HW_UART_NO_DEFAULT_PINS (1)
 diff --git a/ports/rp2/boards/POLOLU_3PI_2040_ROBOT/pololu_3pi_2040_robot.h b/ports/rp2/boards/POLOLU_3PI_2040_ROBOT/pololu_3pi_2040_robot.h
 new file mode 100644
-index 000000000..75814547c
+index 000000000000..75814547c8d5
 --- /dev/null
 +++ b/ports/rp2/boards/POLOLU_3PI_2040_ROBOT/pololu_3pi_2040_robot.h
 @@ -0,0 +1,20 @@
@@ -120,16 +100,28 @@ index 000000000..75814547c
 +#define PICO_RP2040_B0_SUPPORTED 0
 +
 +#endif
+
+From d46bd244ed73f9946fec94973ef316d40ae92fb5 Mon Sep 17 00:00:00 2001
+From: Paul Grayson <paul@pololu.com>
+Date: Tue, 4 Apr 2023 09:23:22 -0700
+Subject: [PATCH 2/2] rp2: Add new NO_DEFAULT_PINS config options for i2c, spi,
+ and uart.
+
+Signed-off-by: Paul Grayson <paul@pololu.com>
+---
+ ports/rp2/machine_i2c.c  | 19 +++++++++++++++++--
+ ports/rp2/machine_spi.c  | 24 +++++++++++++++++++++---
+ ports/rp2/machine_uart.c | 12 ++++++++++--
+ 3 files changed, 48 insertions(+), 7 deletions(-)
+
 diff --git a/ports/rp2/machine_i2c.c b/ports/rp2/machine_i2c.c
-index 85d12c771..0fcf3f8ef 100644
+index fc4c0723a50a..0fcf3f8ef762 100644
 --- a/ports/rp2/machine_i2c.c
 +++ b/ports/rp2/machine_i2c.c
-@@ -33,6 +33,21 @@
- #include "hardware/i2c.h"
- 
+@@ -35,6 +35,20 @@
  #define DEFAULT_I2C_FREQ (400000)
-+#define DEFAULT_I2C_TIMEOUT (50000)
-+
+ #define DEFAULT_I2C_TIMEOUT (50000)
+ 
 +#ifdef MICROPY_HW_I2C_NO_DEFAULT_PINS
 +
 +// With no default I2C, need to require the pin args.
@@ -143,10 +135,11 @@ index 85d12c771..0fcf3f8ef 100644
 +
 +// Most boards do not require pin args.
 +#define MICROPY_I2C_PINS_ARG_OPTS 0
- 
++
  #ifndef MICROPY_HW_I2C0_SCL
  #if PICO_DEFAULT_I2C == 0
-@@ -53,6 +68,7 @@
+ #define MICROPY_HW_I2C0_SCL (PICO_DEFAULT_I2C_SCL_PIN)
+@@ -54,6 +68,7 @@
  #define MICROPY_HW_I2C1_SDA (6)
  #endif
  #endif
@@ -154,27 +147,7 @@ index 85d12c771..0fcf3f8ef 100644
  
  // SDA/SCL on even/odd pins, I2C0/I2C1 on even/odd pairs of pins.
  #define IS_VALID_SCL(i2c, pin) (((pin) & 1) == 1 && (((pin) & 2) >> 1) == (i2c))
-@@ -65,6 +81,7 @@ typedef struct _machine_i2c_obj_t {
-     uint8_t scl;
-     uint8_t sda;
-     uint32_t freq;
-+    uint32_t timeout;
- } machine_i2c_obj_t;
- 
- STATIC machine_i2c_obj_t machine_i2c_obj[] = {
-@@ -74,17 +91,18 @@ STATIC machine_i2c_obj_t machine_i2c_obj[] = {
- 
- STATIC void machine_i2c_print(const mp_print_t *print, mp_obj_t self_in, mp_print_kind_t kind) {
-     machine_i2c_obj_t *self = MP_OBJ_TO_PTR(self_in);
--    mp_printf(print, "I2C(%u, freq=%u, scl=%u, sda=%u)",
--        self->i2c_id, self->freq, self->scl, self->sda);
-+    mp_printf(print, "I2C(%u, freq=%u, scl=%u, sda=%u, timeout=%u)",
-+        self->i2c_id, self->freq, self->scl, self->sda, self->timeout);
- }
- 
- mp_obj_t machine_i2c_make_new(const mp_obj_type_t *type, size_t n_args, size_t n_kw, const mp_obj_t *all_args) {
--    enum { ARG_id, ARG_freq, ARG_scl, ARG_sda };
-+    enum { ARG_id, ARG_freq, ARG_scl, ARG_sda, ARG_timeout };
+@@ -85,8 +100,8 @@ mp_obj_t machine_i2c_make_new(const mp_obj_type_t *type, size_t n_args, size_t n
      static const mp_arg_t allowed_args[] = {
          { MP_QSTR_id, MP_ARG_REQUIRED | MP_ARG_OBJ },
          { MP_QSTR_freq, MP_ARG_INT, {.u_int = DEFAULT_I2C_FREQ} },
@@ -182,46 +155,11 @@ index 85d12c771..0fcf3f8ef 100644
 -        { MP_QSTR_sda, MP_ARG_KW_ONLY | MP_ARG_OBJ, {.u_rom_obj = MP_ROM_NONE} },
 +        { MP_QSTR_scl, MICROPY_I2C_PINS_ARG_OPTS | MP_ARG_KW_ONLY | MP_ARG_OBJ, {.u_rom_obj = MP_ROM_NONE} },
 +        { MP_QSTR_sda, MICROPY_I2C_PINS_ARG_OPTS | MP_ARG_KW_ONLY | MP_ARG_OBJ, {.u_rom_obj = MP_ROM_NONE} },
-+        { MP_QSTR_timeout, MP_ARG_KW_ONLY | MP_ARG_INT, {.u_int = DEFAULT_I2C_TIMEOUT} },
+         { MP_QSTR_timeout, MP_ARG_KW_ONLY | MP_ARG_INT, {.u_int = DEFAULT_I2C_TIMEOUT} },
      };
  
-     // Parse args.
-@@ -121,6 +139,7 @@ mp_obj_t machine_i2c_make_new(const mp_obj_type_t *type, size_t n_args, size_t n
-         self->freq = args[ARG_freq].u_int;
-         i2c_init(self->i2c_inst, self->freq);
-         self->freq = i2c_set_baudrate(self->i2c_inst, self->freq);
-+        self->timeout = args[ARG_timeout].u_int;
-         gpio_set_function(self->scl, GPIO_FUNC_I2C);
-         gpio_set_function(self->sda, GPIO_FUNC_I2C);
-         gpio_set_pulls(self->scl, true, 0);
-@@ -135,14 +154,14 @@ STATIC int machine_i2c_transfer_single(mp_obj_base_t *self_in, uint16_t addr, si
-     int ret;
-     bool nostop = !(flags & MP_MACHINE_I2C_FLAG_STOP);
-     if (flags & MP_MACHINE_I2C_FLAG_READ) {
--        ret = i2c_read_blocking(self->i2c_inst, addr, buf, len, nostop);
-+        ret = i2c_read_timeout_us(self->i2c_inst, addr, buf, len, nostop, self->timeout);
-     } else {
-         if (len == 0) {
-             // Workaround issue with hardware I2C not accepting zero-length writes.
-             mp_machine_soft_i2c_obj_t soft_i2c = {
-                 .base = { &mp_machine_soft_i2c_type },
-                 .us_delay = 500000 / self->freq + 1,
--                .us_timeout = 50000,
-+                .us_timeout = self->timeout,
-                 .scl = self->scl,
-                 .sda = self->sda,
-             };
-@@ -157,7 +176,7 @@ STATIC int machine_i2c_transfer_single(mp_obj_base_t *self_in, uint16_t addr, si
-             gpio_set_function(self->sda, GPIO_FUNC_I2C);
-             return ret;
-         } else {
--            ret = i2c_write_blocking(self->i2c_inst, addr, buf, len, nostop);
-+            ret = i2c_write_timeout_us(self->i2c_inst, addr, buf, len, nostop, self->timeout);
-         }
-     }
-     if (ret < 0) {
 diff --git a/ports/rp2/machine_spi.c b/ports/rp2/machine_spi.c
-index b2b879c9a..fade6a1da 100644
+index b2b879c9a8ed..fade6a1dad20 100644
 --- a/ports/rp2/machine_spi.c
 +++ b/ports/rp2/machine_spi.c
 @@ -39,6 +39,22 @@
@@ -270,7 +208,7 @@ index b2b879c9a..fade6a1da 100644
  
      // Parse the arguments.
 diff --git a/ports/rp2/machine_uart.c b/ports/rp2/machine_uart.c
-index 09870e78f..dade61b0b 100644
+index 09870e78f0d7..dade61b0bd42 100644
 --- a/ports/rp2/machine_uart.c
 +++ b/ports/rp2/machine_uart.c
 @@ -40,6 +40,14 @@
