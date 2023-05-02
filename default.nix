@@ -1,7 +1,7 @@
 let
   # This date is used to identify releases.  It gets baked into the filenames,
   # file system timestamps, and `sys.version` in Python.
-  date = "2023-04-28";
+  date = "2023-05-01";
 
   short_date = (builtins.substring 2 2 date) +
     (builtins.substring 5 2 date) + (builtins.substring 8 2 date);
@@ -94,6 +94,7 @@ let
     buildInputs = [ pkgs.cmake pkgs.gcc pkgs.gcc-arm-embedded pkgs.python3 ];
 
     cmake_flags = "-DMICROPY_BOARD=${MICROPY_BOARD} " +
+      #"-DCMAKE_BUILD_TYPE=Debug " +
       "-DPICO_BUILD_DOCS=0 " +
       "-DUSER_C_MODULES=${ulab_src}/code/micropython.cmake";
 

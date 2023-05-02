@@ -48,5 +48,6 @@ cmake --build .
 
 cp --no-preserve=mode firmware.uf2 $out/$name.uf2
 cp --no-preserve=mode firmware.bin $out/$name.bin
+cp --no-preserve=mode firmware.elf $out/$name.elf
 
 echo "Built $MICROPY_BANNER_NAME_AND_VERSION"
