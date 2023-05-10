@@ -29,7 +29,8 @@ git clone https://github.com/micropython/micropython
 cd micropython
 
 # This part can go away after our changes are merged.
-patch -p1 ../micropython-build/3pi_2040.patch
+patch -p1 -i ../micropython-build/3pi.patch
+patch -p1 -i ../micropython-build/traceback.patch
 
 make -C mpy-cross # build Python cross-compiler
 
