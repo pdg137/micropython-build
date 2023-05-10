@@ -1,7 +1,7 @@
 let
   # This date is used to identify releases.  It gets baked into the filenames,
   # file system timestamps, and `sys.version` in Python.
-  date = "2023-05-01";
+  date = "2023-05-10";
 
   short_date = (builtins.substring 2 2 date) +
     (builtins.substring 5 2 date) + (builtins.substring 8 2 date);
@@ -18,8 +18,8 @@ let
   example_code = pkgs.fetchFromGitHub {
     owner = "pololu";
     repo = "pololu-3pi-2040-robot";
-    rev = "63e9b05c3a7b12d7721cd0b9e2883a379c88d285";  # 2023-04-27
-    hash = "sha256-qoWMnt0gbXQHYEud5Ze8rT2TC6kDhgJmLz9W28Flxjo=";
+    rev = "edc85070ec9820e3740a7d118d253f67ea6fbc86";  # 2023-05-10
+    hash = "sha256-uhod1T8c6q6GN1p3aUMjZjueissL1FrhVBSrvihJey8=";
   };
 
   base = pkgs.stdenv.mkDerivation rec {
@@ -31,15 +31,15 @@ let
     src = pkgs.fetchFromGitHub {
       owner = "micropython";
       repo = "micropython";
-      rev = "867e4dd3dc9235974974fd5dab204371616d6f49";  # master branch, 2023-04-04
-      hash = "sha256-njvG1XfAwfVOCYE4O7lwGWgtmQanqMhdTlDSAEdVhOA=";
+      rev = "4e4bdbd191eb00ef42d9bd6fe9a8303a16f6878d";  # master branch, 2023-05-09
+      hash = "sha256-7uZw5JV6wDyhPlzKc0oM0zSDv6Xzm/xOVhP8inm7u0U=";
     };
     patches = [ ./3pi.patch ./traceback.patch ];
 
     # After changing the MicroPython version above, run
     # 'git describe --tags --match=v*' to get the new values for these:
     version = "v1.20.0";
-    version_suffix = "-24";
+    version_suffix = "-62";
     MICROPY_GIT_TAG = version + version_suffix + "-g" + MICROPY_GIT_HASH;
     MICROPY_GIT_HASH = builtins.substring 0 9 src.rev;
 
@@ -53,8 +53,8 @@ let
     lib_mbedtls = pkgs.fetchFromGitHub {
       owner = "ARMmbed";
       repo = "mbedtls";
-      rev = "1bc2c9cb8b8fe4659bd94b8ebba5a4c02029b7fa";
-      hash = "sha256-DiX++cDFRHfx67BDRMDd03G62aGvwAzqkgFWenroRAw=";
+      rev = "981743de6fcdbe672e482b6fd724d31d0a0d2476";
+      hash = "sha256-w5bJErCNRZLE8rHcuZlK3bOqel97gPPMKH2cPGUR6Zw=";
     };
     lib_micropython_lib = pkgs.fetchFromGitHub {
       owner = "micropython";
@@ -78,13 +78,13 @@ let
     ulab_src = pkgs.fetchFromGitHub {
       owner = "v923z";
       repo = "micropython-ulab";
-      rev = "8c3e1058d441c2d075febadc8b7993b03e152bf9";  # 2023-03-03
-      hash = "sha256-gbZFgCdbtr4oxSAfGONJpSJm4k3u8QGSOlM3iOkT9tI=";
+      rev = "ac2e9954edc185ec212e437e73e4b5e4290de35b";  # 2023-05-07
+      hash = "sha256-BVhPoZGyKP4x/CDFR5F3+edD7oT6J31t+EASVO0qYSI=";
     };
 
     # After changing the ulab version, run
     # 'git describe --tags' to get the new value of this:
-    ulab_git_tag = "5.1.1-27-g" + builtins.substring 0 7 ulab_src.rev;
+    ulab_git_tag = "6.0.12"; #+ builtins.substring 0 7 ulab_src.rev;
 
     MICROPY_BANNER_NAME_AND_VERSION =
       "MicroPython ${MICROPY_GIT_TAG} build ${build_git_tag}; with ulab ${ulab_git_tag}";

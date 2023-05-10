@@ -15,7 +15,6 @@ done
 rmdir lib/mbedtls
 ln -s $lib_mbedtls lib/mbedtls
 cp lib/mbedtls/LICENSE $out/licenses/LICENSE_mbedtls.txt
-cp lib/mbedtls/apache-2.0.txt $out/licenses/apache-2.0_mbedtls.txt
 
 rmdir lib/micropython-lib
 ln -s $lib_micropython_lib lib/micropython-lib
