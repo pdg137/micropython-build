@@ -1,7 +1,7 @@
 # MicroPython build scripts
 
 This repository contains code and instructions for building [MicroPython]
-firmware images for the Pololu 3pi+ 2040 Robot.
+firmware images for the 3pi+ 2040 Robot and the Zumo 2040 Robot.
 
 ## Building with Nix
 
@@ -17,11 +17,15 @@ different machines or at two different times, you should get the exact same resu
 
 ## Manual build
 
-To build your own updated version of MicroPython for the 3pi+, you
+To build your own updated version of MicroPython without using Nix, you
 can follow these steps on a Linux machine:
 
 ```text
 sudo apt install git cmake make gcc gcc-arm-none-eabi python3 # for Debian/Ubuntu
+
+# Run one of these commands to define what board you are building for.
+export BOARD=POLOLU_3PI_2040_ROBOT
+export BOARD=POLOLU_ZUMO_2040_ROBOT
 
 git clone https://github.com/pololu/micropython-build
 git clone https://github.com/v923z/micropython-ulab ulab
@@ -29,19 +33,17 @@ git clone https://github.com/micropython/micropython
 cd micropython
 
 # This part can go away after our changes are merged.
-patch -p1 -i ../micropython-build/3pi.patch
-patch -p1 -i ../micropython-build/traceback.patch
-
-make -C mpy-cross # build Python cross-compiler
+cat ../micropython-build/*.patch | patch -p1
 
 cd ports/rp2
-make BOARD=POLOLU_3PI_2040_ROBOT submodules
-make BOARD=POLOLU_3PI_2040_ROBOT clean
-make USER_C_MODULES=../../../ulab/code/micropython.cmake BOARD=POLOLU_3PI_2040_ROBOT
+make submodules
+make clean
+make USER_C_MODULES=../../../ulab/code/micropython.cmake
 ```
 
-There will now be a `firmware.uf2` file in the `build-POLOLU_3PI_2040_ROBOT` directory
-that you can use.  It will not contain a file system or example code for the robot.
+There will now be a `firmware.uf2` file in the `build-*` directory
+for your robot that you can use.  It will not contain a file system
+or example code for the robot.
 
 ## Acknowledgments
 
