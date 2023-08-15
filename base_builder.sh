@@ -20,13 +20,19 @@ rmdir lib/micropython-lib
 ln -s $lib_micropython_lib lib/micropython-lib
 cp lib/micropython-lib/LICENSE $out/licenses/LICENSE_micropython_lib.txt
 
-rmdir lib/pico-sdk
-ln -s $lib_pico_sdk lib/pico-sdk
-cp lib/pico-sdk/LICENSE.TXT $out/licenses/LICENSE_pico_sdk.txt
-
 rmdir lib/tinyusb
 ln -s $lib_tinyusb lib/tinyusb
 cp lib/tinyusb/LICENSE $out/licenses/LICENSE_tinyusb.txt
+
+rmdir lib/pico-sdk
+cp -r --no-preserve=mode $lib_pico_sdk lib/pico-sdk
+cp lib/pico-sdk/LICENSE.TXT $out/licenses/LICENSE_pico_sdk.txt
+cd lib/pico-sdk
+for patch in $pico_sdk_patches; do
+  echo applying patch $patch
+  patch -p1 -i $patch
+done
+cd ../..
 
 cat >> ports/rp2/boards/$MICROPY_BOARD/mpconfigboard.h <<END
 #define MICROPY_BANNER_NAME_AND_VERSION "$MICROPY_BANNER_NAME_AND_VERSION"

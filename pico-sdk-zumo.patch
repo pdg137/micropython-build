@@ -1,0 +1,44 @@
+https://github.com/raspberrypi/pico-sdk/pull/1475.patch
+
+From 824b2f6e6235390ce7e1c6dd8be6a5e38b621bfe Mon Sep 17 00:00:00 2001
+From: Paul Grayson <pdg@alum.mit.edu>
+Date: Sun, 13 Aug 2023 22:45:58 -0700
+Subject: [PATCH] Add board definition for upcoming Pololu Zumo 2040 Robot
+
+---
+ .../include/boards/pololu_zumo_2040_robot.h   | 26 +++++++++++++++++++
+ 1 file changed, 26 insertions(+)
+ create mode 100644 src/boards/include/boards/pololu_zumo_2040_robot.h
+
+diff --git a/src/boards/include/boards/pololu_zumo_2040_robot.h b/src/boards/include/boards/pololu_zumo_2040_robot.h
+new file mode 100644
+index 00000000..252cea98
+--- /dev/null
++++ b/src/boards/include/boards/pololu_zumo_2040_robot.h
+@@ -0,0 +1,26 @@
++/*
++ * Copyright (c) 2023 Raspberry Pi (Trading) Ltd.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++// -----------------------------------------------------
++// NOTE: THIS HEADER IS ALSO INCLUDED BY ASSEMBLER SO
++//       SHOULD ONLY CONSIST OF PREPROCESSOR DIRECTIVES
++// -----------------------------------------------------
++
++#ifndef _POLOLU_ZUMO_2040_ROBOT_H
++#define _POLOLU_ZUMO_2040_ROBOT_H
++
++// For board detection
++#define POLOLU_ZUMO_2040_ROBOT
++
++#define PICO_DEFAULT_LED_PIN 25
++#define PICO_BOOT_STAGE2_CHOOSE_W25Q080 1
++#define PICO_FLASH_SPI_CLKDIV 2
++#define PICO_FLASH_SIZE_BYTES (16 * 1024 * 1024)
++
++// All boards have at least the B1 revision
++#define PICO_RP2040_B0_SUPPORTED 0
++
++#endif

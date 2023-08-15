@@ -33,7 +33,9 @@ git clone https://github.com/micropython/micropython
 cd micropython
 
 # This part can go away after our changes are merged.
-cat ../micropython-build/*.patch | patch -p1
+cat ../micropython-build/mpy*.patch | patch -p1
+git submodule update --init lib/pico-sdk
+cat ../micropython-build/pico-sdk*.patch | (cd lib/pico-sdk && patch -p1)
 
 cd ports/rp2
 make submodules

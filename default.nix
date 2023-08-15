@@ -23,7 +23,7 @@ let
       rev = "4e4bdbd191eb00ef42d9bd6fe9a8303a16f6878d";  # master branch, 2023-05-09
       hash = "sha256-7uZw5JV6wDyhPlzKc0oM0zSDv6Xzm/xOVhP8inm7u0U=";
     };
-    patches = [ ./3pi.patch ./traceback.patch ];
+    patches = [ ./mpy-boards.patch ./mpy-traceback.patch ];
 
     # After changing the MicroPython version above, run
     # 'git describe --tags --match=v*' to get the new values for these:
@@ -53,8 +53,8 @@ let
   lib_pico_sdk = pkgs.fetchFromGitHub {
     owner = "raspberrypi";
     repo = "pico-sdk";
-    rev = "f396d05f8252d4670d4ea05c8b7ac938ef0cd381";
-    hash = "sha256-p69go8KXQR21szPb+R1xuonyFj+ZJDunNeoU7M3zIsE=";
+    rev = "6a7db34ff63345a7badec79ebea3aaef1712f374";
+    hash = "sha256-JNcxd86XNNiPkvipVFR3X255boMmq+YcuJXUP4JwInU=";
   };
   lib_tinyusb = pkgs.fetchFromGitHub {
     owner = "hathach";
@@ -62,6 +62,8 @@ let
     rev = "868f2bcda092b0b8d5f7ac55ffaef2c81316d35e";
     hash = "sha256-R3BUj8q3/q2Z+bh73jJTrepoLuziU8HdUAaVXTXtRBk=";
   };
+
+  pico_sdk_patches = [ ./pico-sdk-zumo.patch ];
 
   ulab_src = pkgs.fetchFromGitHub {
     owner = "v923z";
@@ -86,7 +88,7 @@ let
         MICROPY_GIT_TAG = version + version_suffix + "-g" + MICROPY_GIT_HASH;
         MICROPY_GIT_HASH = builtins.substring 0 9 src.rev;
 
-        inherit lib_mbedtls lib_micropython_lib lib_pico_sdk lib_tinyusb ulab_src ulab_git_tag;
+        inherit lib_mbedtls lib_micropython_lib lib_pico_sdk pico_sdk_patches lib_tinyusb ulab_src ulab_git_tag;
 
         MICROPY_BANNER_NAME_AND_VERSION =
           "MicroPython ${MICROPY_GIT_TAG} build ${build_git_tag}; with ulab ${ulab_git_tag}";
@@ -129,7 +131,7 @@ in rec {
     file_name = "pololu-zumo-2040-robot";
     MICROPY_BOARD = "POLOLU_ZUMO_2040_ROBOT";
     start_url = "https://www.pololu.com/zumo/start";
-    example_code = p3pi.example_code;  # TODO
+    example_code = throw "TODO";
   };
 
   # Run this to avoid having most of the useful things garbage collected:
