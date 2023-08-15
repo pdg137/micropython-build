@@ -2,7 +2,7 @@ let
 
   # This date is used to identify releases.  It gets baked into the filenames,
   # file system timestamps, and `sys.version` in Python.
-  date = "2023-05-10";
+  date = "2023-08-15";
 
   short_date = (builtins.substring 2 2 date) +
     (builtins.substring 5 2 date) + (builtins.substring 8 2 date);
@@ -20,15 +20,15 @@ let
     src = pkgs.fetchFromGitHub {
       owner = "micropython";
       repo = "micropython";
-      rev = "4e4bdbd191eb00ef42d9bd6fe9a8303a16f6878d";  # master branch, 2023-05-09
-      hash = "sha256-7uZw5JV6wDyhPlzKc0oM0zSDv6Xzm/xOVhP8inm7u0U=";
+      rev = "00855eeb36acaf626f153d8c1850ca75744b1c55";  # master branch, 2023-08-03
+      hash = "sha256-z4/4o7StkwEtFFMEoFEzragWBZKy4Dw2UVDRtY5gNWk=";
     };
     patches = [ ./mpy-boards.patch ./mpy-traceback.patch ];
 
     # After changing the MicroPython version above, run
     # 'git describe --tags --match=v*' to get the new values for these:
     version = "v1.20.0";
-    version_suffix = "-62";
+    version_suffix = "-369";
   };
 
   # Submodules of MicroPython needed by the RP2 port.
@@ -85,8 +85,8 @@ let
         inherit MICROPY_BOARD date;
         inherit (micropython) src patches version version_suffix;
 
-        MICROPY_GIT_TAG = version + version_suffix + "-g" + MICROPY_GIT_HASH;
         MICROPY_GIT_HASH = builtins.substring 0 9 src.rev;
+        MICROPY_GIT_TAG = version + version_suffix + "-g" + MICROPY_GIT_HASH;
 
         inherit lib_mbedtls lib_micropython_lib lib_pico_sdk pico_sdk_patches lib_tinyusb ulab_src ulab_git_tag;
 
@@ -131,7 +131,7 @@ in rec {
     file_name = "pololu-zumo-2040-robot";
     MICROPY_BOARD = "POLOLU_ZUMO_2040_ROBOT";
     start_url = "https://www.pololu.com/zumo/start";
-    example_code = throw "TODO";
+    example_code = ../zumo-2040-robot;  # TODO: fetch from GitHub
   };
 
   # Run this to avoid having most of the useful things garbage collected:
