@@ -2,7 +2,7 @@ let
 
   # This date is used to identify releases.  It gets baked into the filenames,
   # file system timestamps, and `sys.version` in Python.
-  date = "2023-08-15";
+  date = "2023-10-27";
 
   short_date = (builtins.substring 2 2 date) +
     (builtins.substring 5 2 date) + (builtins.substring 8 2 date);
@@ -20,15 +20,15 @@ let
     src = pkgs.fetchFromGitHub {
       owner = "micropython";
       repo = "micropython";
-      rev = "00855eeb36acaf626f153d8c1850ca75744b1c55";  # master branch, 2023-08-03
-      hash = "sha256-z4/4o7StkwEtFFMEoFEzragWBZKy4Dw2UVDRtY5gNWk=";
+      rev = "05cb1406ad1b421a238faf763e19f4119f5f6bb2";  # master branch, 2023-10-11
+      hash = "sha256-zgaa1sRGTyBGDrBFrhiUvuDYe1YGkJcbmFmuhieRBZc=";
     };
     patches = [ ./mpy-boards.patch ./mpy-traceback.patch ];
 
     # After changing the MicroPython version above, run
     # 'git describe --tags --match=v*' to get the new values for these:
-    version = "v1.20.0";
-    version_suffix = "-369";
+    version = "v1.22.0-preview";
+    version_suffix = "-8";
   };
 
   # Submodules of MicroPython needed by the RP2 port.
@@ -47,8 +47,8 @@ let
   lib_micropython_lib = pkgs.fetchFromGitHub {
     owner = "micropython";
     repo = "micropython-lib";
-    rev = "c113611765278b2fc8dcf8b2f2c3513b35a69b39";
-    hash = "sha256-Bh21HxOUVdFbbtAPTr3I5krhS5kIqBbMleUCodg3hBo=";
+    rev = "e025c843b60e93689f0f991d753010bb5bd6a722";
+    hash = "sha256-ilKBoIQy3xW+s5djp0jShjO/G29vASfUn6gBoHedMxk=";
   };
   lib_pico_sdk = pkgs.fetchFromGitHub {
     owner = "raspberrypi";
@@ -59,22 +59,22 @@ let
   lib_tinyusb = pkgs.fetchFromGitHub {
     owner = "hathach";
     repo = "tinyusb";
-    rev = "868f2bcda092b0b8d5f7ac55ffaef2c81316d35e";
-    hash = "sha256-R3BUj8q3/q2Z+bh73jJTrepoLuziU8HdUAaVXTXtRBk=";
+    rev = "1fdf29075d4e613eacfa881166015263797db0f6";
+    hash = "sha256-2u+ESlbKrr9dLq09Ictr6Ke/b8EHWxXKRxkLlbap+ss=";
   };
 
-  pico_sdk_patches = [ ./pico-sdk-zumo.patch ];
+  pico_sdk_patches = [ ];
 
   ulab_src = pkgs.fetchFromGitHub {
     owner = "v923z";
     repo = "micropython-ulab";
-    rev = "ac2e9954edc185ec212e437e73e4b5e4290de35b";  # 2023-05-07
-    hash = "sha256-BVhPoZGyKP4x/CDFR5F3+edD7oT6J31t+EASVO0qYSI=";
+    rev = "a05ec05351260cf48fefc347265b8d8bf29c03f1";  # 2023-08-10
+    hash = "sha256-jo9eowplUgKOmdUFJsoDkEI7s7HvaH5Ya3tHxVoXN8k=";
   };
 
-  # After changing the ulab version, run
-  # 'git describe --tags' to get the new value of this:
-  ulab_git_tag = "6.0.12"; #+ builtins.substring 0 7 ulab_src.rev;
+  # After changing the ulab version, look in its docs/ulab-change-log.md
+  # file to get the new version of this.
+  ulab_git_tag = "6.4.0" + builtins.substring 0 7 ulab_src.rev;
 
   board = { board_name, file_name, MICROPY_BOARD, example_code, start_url }:
     let
