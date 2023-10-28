@@ -74,7 +74,7 @@ let
 
   # After changing the ulab version, look in its docs/ulab-change-log.md
   # file to get the new version of this.
-  ulab_git_tag = "6.4.0" + builtins.substring 0 7 ulab_src.rev;
+  ulab_git_tag = "6.4.0" + "-" + builtins.substring 0 7 ulab_src.rev;
 
   board = { board_name, file_name, MICROPY_BOARD, example_code, start_url }:
     let
