@@ -2,7 +2,7 @@ let
 
   # This date is used to identify releases.  It gets baked into the filenames,
   # file system timestamps, and `sys.version` in Python.
-  date = "2023-10-27";
+  date = "2023-11-13";
 
   short_date = (builtins.substring 2 2 date) +
     (builtins.substring 5 2 date) + (builtins.substring 8 2 date);
@@ -131,7 +131,12 @@ in rec {
     file_name = "pololu-zumo-2040-robot";
     MICROPY_BOARD = "POLOLU_ZUMO_2040_ROBOT";
     start_url = "https://www.pololu.com/zumo/start";
-    example_code = ../zumo-2040-robot;  # TODO: fetch from GitHub
+    example_code = pkgs.fetchFromGitHub {
+      owner = "pololu";
+      repo = "zumo-2040-robot";
+      rev = "629845142ddc44e34f1340484afa8a22eab89d57";  # 2023-11-13
+      hash = "sha256-C044Eo3TCdePG3qZVKLUju8tNbDlhaSGfuJnGT0ztog=";
+    };
   };
 
   # Run this to avoid having most of the useful things garbage collected:
