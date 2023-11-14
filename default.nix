@@ -117,12 +117,12 @@ in rec {
     board_name = "Pololu 3pi+ 2040 Robot";
     file_name = "pololu-3pi-2040-robot";
     MICROPY_BOARD = "POLOLU_3PI_2040_ROBOT";
-    start_url = "https://www.pololu.com/3pi/start";    
+    start_url = "https://www.pololu.com/3pi/start";
     example_code = pkgs.fetchFromGitHub {
       owner = "pololu";
       repo = "pololu-3pi-2040-robot";
-      rev = "edc85070ec9820e3740a7d118d253f67ea6fbc86";  # 2023-05-10
-      hash = "sha256-uhod1T8c6q6GN1p3aUMjZjueissL1FrhVBSrvihJey8=";
+      rev = "bf2688c366d4986be37e88ee364e237050a11e6b";  # 2023-11-13
+      hash = "sha256-/e8KfNVponv1Crf67B5z/3PCRMo60oHCOpiIeU3+fPM=";
     };
   };
 
