@@ -2,7 +2,7 @@ let
 
   # This date is used to identify releases.  It gets baked into the filenames,
   # file system timestamps, and `sys.version` in Python.
-  date = "2023-11-13";
+  date = "2024-01-17";
 
   short_date = (builtins.substring 2 2 date) +
     (builtins.substring 5 2 date) + (builtins.substring 8 2 date);
@@ -11,24 +11,24 @@ let
     builtins.throw "Be sure to use build.sh.  See README." else
     short_date + "-" + builtins.getEnv "COMMIT";
 
-  # nixos-22.11 branch, 2022-12-14
+  # nixos-23.11 branch, 2024-01-14
   nixpkgs = import (fetchTarball
-    "https://github.com/NixOS/nixpkgs/archive/170e39462b516bd1475ce9184f7bb93106d27c59.tar.gz");
+    "https://github.com/NixOS/nixpkgs/archive/428544ae95eec077c7f823b422afae5f174dee4b.tar.gz");
   pkgs = nixpkgs {};
 
   micropython = {
     src = pkgs.fetchFromGitHub {
       owner = "micropython";
       repo = "micropython";
-      rev = "05cb1406ad1b421a238faf763e19f4119f5f6bb2";  # master branch, 2023-10-11
-      hash = "sha256-zgaa1sRGTyBGDrBFrhiUvuDYe1YGkJcbmFmuhieRBZc=";
+      rev = "9b8c64c9cee8203be167e6bffc74e186ae2fc958";  # 1.22.1 release
+      hash = "sha256-tGFXJW1RkUs/64Yatgg/1zZFPDQdu76uiMjNU8ebdvg=";
     };
-    patches = [ ./mpy-boards.patch ./mpy-traceback.patch ];
+    patches = [ ./mpy-traceback.patch ];
 
     # After changing the MicroPython version above, run
     # 'git describe --tags --match=v*' to get the new values for these:
-    version = "v1.22.0-preview";
-    version_suffix = "-8";
+    version = "v1.22.1";
+    version_suffix = ""; # e.g. "-47"
   };
 
   # Submodules of MicroPython needed by the RP2 port.
@@ -38,6 +38,12 @@ let
   # After changing the MicroPython version, get the info you need to update this by
   # running in the MicroPython repository:
   #   cd ports/rp2 && make submodules && git submodule status --recursive | grep '^ '
+  lib_berkeley_db = pkgs.fetchFromGitHub {
+    owner = "pfalcon";
+    repo = "berkeley-db-1.xx";
+    rev = "35aaec4418ad78628a3b935885dd189d41ce779b";
+    hash = "sha256-XItxmpXXPgv11LcnL7dty6uq1JctGokHCU8UGG9ic04=";
+  };
   lib_mbedtls = pkgs.fetchFromGitHub {
     owner = "ARMmbed";
     repo = "mbedtls";
@@ -47,8 +53,8 @@ let
   lib_micropython_lib = pkgs.fetchFromGitHub {
     owner = "micropython";
     repo = "micropython-lib";
-    rev = "e025c843b60e93689f0f991d753010bb5bd6a722";
-    hash = "sha256-ilKBoIQy3xW+s5djp0jShjO/G29vASfUn6gBoHedMxk=";
+    rev = "7cdf70881519c73667efbc4a61a04d9c1a49babb";
+    hash = "sha256-XkBX+xMcaJsNs+VjNiZ8XNliMlsum8Gi+ndrxmVnM+M=";
   };
   lib_pico_sdk = pkgs.fetchFromGitHub {
     owner = "raspberrypi";
@@ -68,13 +74,13 @@ let
   ulab_src = pkgs.fetchFromGitHub {
     owner = "v923z";
     repo = "micropython-ulab";
-    rev = "a05ec05351260cf48fefc347265b8d8bf29c03f1";  # 2023-08-10
-    hash = "sha256-jo9eowplUgKOmdUFJsoDkEI7s7HvaH5Ya3tHxVoXN8k=";
+    rev = "9a1d03d90d9ae1c7f676941f618d0451030354f7";  # 2024-01-16
+    hash = "sha256-82Qd41jG2EBCjyGWXVO1tFpwY71mvOhQLazfl33M0pw=";
   };
 
   # After changing the ulab version, look in its docs/ulab-change-log.md
   # file to get the new version of this.
-  ulab_git_tag = "6.4.0" + "-" + builtins.substring 0 7 ulab_src.rev;
+  ulab_git_tag = "6.5.0" + "-" + builtins.substring 0 7 ulab_src.rev;
 
   board = { board_name, file_name, MICROPY_BOARD, example_code, start_url }:
     let
@@ -88,7 +94,7 @@ let
         MICROPY_GIT_HASH = builtins.substring 0 9 src.rev;
         MICROPY_GIT_TAG = version + version_suffix + "-g" + MICROPY_GIT_HASH;
 
-        inherit lib_mbedtls lib_micropython_lib lib_pico_sdk pico_sdk_patches lib_tinyusb ulab_src ulab_git_tag;
+        inherit lib_berkeley_db lib_mbedtls lib_micropython_lib lib_pico_sdk pico_sdk_patches lib_tinyusb ulab_src ulab_git_tag;
 
         MICROPY_BANNER_NAME_AND_VERSION =
           "MicroPython ${MICROPY_GIT_TAG} build ${build_git_tag}; with ulab ${ulab_git_tag}";
@@ -121,8 +127,8 @@ in rec {
     example_code = pkgs.fetchFromGitHub {
       owner = "pololu";
       repo = "pololu-3pi-2040-robot";
-      rev = "bf2688c366d4986be37e88ee364e237050a11e6b";  # 2023-11-13
-      hash = "sha256-/e8KfNVponv1Crf67B5z/3PCRMo60oHCOpiIeU3+fPM=";
+      rev = "6ddb719da080c21d9d1fb03e9f92007a12848f24";  # 2024-01-16
+      hash = "sha256-KcT2ChRHVFUHAa1h+B75kmP1wDPcyP1cxVF3IsEllxU=";
     };
   };
 
@@ -134,8 +140,8 @@ in rec {
     example_code = pkgs.fetchFromGitHub {
       owner = "pololu";
       repo = "zumo-2040-robot";
-      rev = "629845142ddc44e34f1340484afa8a22eab89d57";  # 2023-11-13
-      hash = "sha256-C044Eo3TCdePG3qZVKLUju8tNbDlhaSGfuJnGT0ztog=";
+      rev = "7bf996d4aa4180349538ab3c64980621930f6623";  # 2024-01-16
+      hash = "sha256-V+vFeZ82soP77lXwHTVZks7a2DvdbjIJckPnrViBgCE=";
     };
   };
 
