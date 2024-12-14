@@ -2,7 +2,7 @@ let
 
   # This date is used to identify releases.  It gets baked into the filenames,
   # file system timestamps, and `sys.version` in Python.
-  date = "2024-01-17";
+  date = "2024-12-14";
 
   short_date = (builtins.substring 2 2 date) +
     (builtins.substring 5 2 date) + (builtins.substring 8 2 date);
@@ -11,23 +11,27 @@ let
     builtins.throw "Be sure to use build.sh.  See README." else
     short_date + "-" + builtins.getEnv "COMMIT";
 
-  # nixos-23.11 branch, 2024-01-14
-  nixpkgs = import (fetchTarball
-    "https://github.com/NixOS/nixpkgs/archive/428544ae95eec077c7f823b422afae5f174dee4b.tar.gz");
+  # nixos-24.11 branch, 2024-12-14
+  nixpkgs = import (fetchTarball {
+    url = "https://github.com/NixOS/nixpkgs/archive/a0f3e10d94359665dba45b71b4227b0aeb851f8e.tar.gz";
+    sha256 = "0nci4yyxpjhvkmgvb97xjqaql6dbd3f7xmqa8ala750y6hshhv19";
+  });
   pkgs = nixpkgs {};
 
   micropython = {
     src = pkgs.fetchFromGitHub {
       owner = "micropython";
       repo = "micropython";
-      rev = "9b8c64c9cee8203be167e6bffc74e186ae2fc958";  # 1.22.1 release
-      hash = "sha256-tGFXJW1RkUs/64Yatgg/1zZFPDQdu76uiMjNU8ebdvg=";
+      rev = "ecfdd5d6f9be971852003c2049600dc7b3e2a838"; # 1.24.1
+      hash = "sha256-Dc40uLyLQBfs8Elku8g+sTz/OETsFNqLqp/xnbF/rn4=";
     };
-    patches = [ ./mpy-traceback.patch ];
+    # 2024-12-14 - not working
+    # patches = [ ./mpy-traceback.patch ];
+    patches = [ ];
 
     # After changing the MicroPython version above, run
     # 'git describe --tags --match=v*' to get the new values for these:
-    version = "v1.22.1";
+    version = "v1.24.1";
     version_suffix = ""; # e.g. "-47"
   };
 
@@ -38,35 +42,41 @@ let
   # After changing the MicroPython version, get the info you need to update this by
   # running in the MicroPython repository:
   #   cd ports/rp2 && make submodules && git submodule status --recursive | grep '^ '
+  lib_axtls = pkgs.fetchFromGitHub {
+    owner = "micropython";
+    repo = "axtls";
+    rev = "531cab9c278c947d268bd4c94ecab9153a961b43";
+    hash = "sha256-+Uh598l4ri6y5nwoV+bPozmpHlhpzOO2LLaRVOIj6hU=";
+  };
   lib_berkeley_db = pkgs.fetchFromGitHub {
     owner = "pfalcon";
     repo = "berkeley-db-1.xx";
-    rev = "35aaec4418ad78628a3b935885dd189d41ce779b";
-    hash = "sha256-XItxmpXXPgv11LcnL7dty6uq1JctGokHCU8UGG9ic04=";
+    rev = "85373b548f1fb0119a463582570b44189dfb09ae";
+    hash = "sha256-HyQXMy5mruTQHL4LcACfLxJGhu6jpOSQbnbS/A/aGE0=";
   };
   lib_mbedtls = pkgs.fetchFromGitHub {
     owner = "ARMmbed";
     repo = "mbedtls";
-    rev = "981743de6fcdbe672e482b6fd724d31d0a0d2476";
-    hash = "sha256-w5bJErCNRZLE8rHcuZlK3bOqel97gPPMKH2cPGUR6Zw=";
+    rev = "edb8fec9882084344a314368ac7fd957a187519c";
+    hash = "sha256-HxsHcGbSExp1aG5yMR/J3kPL4zqnmNoN5T5wfV3APaw=";
   };
   lib_micropython_lib = pkgs.fetchFromGitHub {
     owner = "micropython";
     repo = "micropython-lib";
-    rev = "7cdf70881519c73667efbc4a61a04d9c1a49babb";
-    hash = "sha256-XkBX+xMcaJsNs+VjNiZ8XNliMlsum8Gi+ndrxmVnM+M=";
+    rev = "68e3e07bc7ab63931cead3854b2a114e9a084248";
+    hash = "sha256-ZL0zKCGzMpK4L/394JP+Xhu9dNPkLWVzqDppPVDNBnw=";
   };
   lib_pico_sdk = pkgs.fetchFromGitHub {
     owner = "raspberrypi";
     repo = "pico-sdk";
-    rev = "6a7db34ff63345a7badec79ebea3aaef1712f374";
-    hash = "sha256-JNcxd86XNNiPkvipVFR3X255boMmq+YcuJXUP4JwInU=";
+    rev = "efe2103f9b28458a1615ff096054479743ade236";
+    hash = "sha256-d6mEjuG8S5jvJS4g8e90gFII3sEqUVlT2fgd9M9LUkA=";
   };
   lib_tinyusb = pkgs.fetchFromGitHub {
     owner = "hathach";
     repo = "tinyusb";
-    rev = "1fdf29075d4e613eacfa881166015263797db0f6";
-    hash = "sha256-2u+ESlbKrr9dLq09Ictr6Ke/b8EHWxXKRxkLlbap+ss=";
+    rev = "5217cee5de4cd555018da90f9f1bcc87fb1c1d3a";
+    hash = "sha256-spkx1LbRfIzSpZVTBj2Y6z9AB51blvrDxF6nBXnVvGw=";
   };
 
   pico_sdk_patches = [ ];
@@ -74,13 +84,13 @@ let
   ulab_src = pkgs.fetchFromGitHub {
     owner = "v923z";
     repo = "micropython-ulab";
-    rev = "9a1d03d90d9ae1c7f676941f618d0451030354f7";  # 2024-01-16
-    hash = "sha256-82Qd41jG2EBCjyGWXVO1tFpwY71mvOhQLazfl33M0pw=";
+    rev = "303e8d790acc6e996c6851f00fa98122b3f85000";  # 6.6.1 2024-11-24
+    hash = "sha256-XLkZThEtt3kxVG4ri4ey9godDND2GagXm21BcUGRKiA=";
   };
 
   # After changing the ulab version, look in its docs/ulab-change-log.md
   # file to get the new version of this.
-  ulab_git_tag = "6.5.0" + "-" + builtins.substring 0 7 ulab_src.rev;
+  ulab_git_tag = "6.6.1" + "-" + builtins.substring 0 7 ulab_src.rev;
 
   board = { board_name, file_name, MICROPY_BOARD, example_code, start_url }:
     let
@@ -94,12 +104,13 @@ let
         MICROPY_GIT_HASH = builtins.substring 0 9 src.rev;
         MICROPY_GIT_TAG = version + version_suffix + "-g" + MICROPY_GIT_HASH;
 
-        inherit lib_berkeley_db lib_mbedtls lib_micropython_lib lib_pico_sdk pico_sdk_patches lib_tinyusb ulab_src ulab_git_tag;
+        inherit lib_axtls lib_berkeley_db lib_mbedtls lib_micropython_lib lib_pico_sdk pico_sdk_patches lib_tinyusb ulab_src ulab_git_tag;
 
         MICROPY_BANNER_NAME_AND_VERSION =
           "MicroPython ${MICROPY_GIT_TAG} build ${build_git_tag}; with ulab ${ulab_git_tag}";
 
-        buildInputs = [ pkgs.cmake pkgs.gcc pkgs.gcc-arm-embedded pkgs.python3 ];
+        buildInputs = with pkgs;
+          [ cmake gcc gcc-arm-embedded python3 picotool ];
 
         cmake_flags = "-DMICROPY_BOARD=${MICROPY_BOARD} " +
           #"-DCMAKE_BUILD_TYPE=Debug " +
