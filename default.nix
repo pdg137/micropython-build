@@ -25,9 +25,12 @@ let
       rev = "ecfdd5d6f9be971852003c2049600dc7b3e2a838"; # 1.24.1
       hash = "sha256-Dc40uLyLQBfs8Elku8g+sTz/OETsFNqLqp/xnbF/rn4=";
     };
-    # 2024-12-14 - not working
+
+    # 2024-12-14 - this one is not working
     # patches = [ ./mpy-traceback.patch ];
-    patches = [ ];
+
+    # Change the Pico firmware to use a 1MB USB Mass Storage filesystem.
+    patches = [ ./pico-1mb-mass-storage.patch ];
 
     # After changing the MicroPython version above, run
     # 'git describe --tags --match=v*' to get the new values for these:
@@ -130,6 +133,19 @@ let
     in image // { inherit base; };
 
 in rec {
+  pico = board {
+    board_name = "Raspberry Pi Pico";
+    file_name = "pico";
+    MICROPY_BOARD = "RPI_PICO";
+    start_url = "https://www.raspberrypi.com/documentation/microcontrollers/pico-series.html";
+    example_code = pkgs.fetchFromGitHub {
+      owner = "pdg137";
+      repo = "pico-blink-demo";
+      rev = "8b11ca2e9f2c697246ba90e10fe0d499e115a33f";  # 2024-01-16
+      hash = "sha256-gIJPw2MrCHhC4Uj6Zzv+UXefHkAz1psfzh+JH6xDSJU=";
+    };
+  };
+
   pololu-3pi-2040-robot = board {
     board_name = "Pololu 3pi+ 2040 Robot";
     file_name = "pololu-3pi-2040-robot";
