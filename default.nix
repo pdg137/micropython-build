@@ -2,7 +2,7 @@ let
 
   # This date is used to identify releases.  It gets baked into the filenames,
   # file system timestamps, and `sys.version` in Python.
-  date = "2024-12-14";
+  date = "2025-01-19";
 
   short_date = (builtins.substring 2 2 date) +
     (builtins.substring 5 2 date) + (builtins.substring 8 2 date);
@@ -95,7 +95,7 @@ let
   # file to get the new version of this.
   ulab_git_tag = "6.6.1" + "-" + builtins.substring 0 7 ulab_src.rev;
 
-  board = { board_name, file_name, MICROPY_BOARD, example_code, start_url }:
+  board = { board_name, file_name, MICROPY_BOARD, example_code, start_url, image_size_mb }:
     let
       base = pkgs.stdenv.mkDerivation rec {
         name = "micropython-base" + name_suffix;
@@ -125,7 +125,7 @@ let
 
       image = pkgs.stdenv.mkDerivation {
         name = "micropython" + base.name_suffix;
-        inherit board_name start_url date base example_code;
+        inherit board_name start_url date base example_code image_size_mb;
         bin2uf2 = ./bin2uf2.rb;
         buildInputs = [ pkgs.dosfstools pkgs.libfaketime pkgs.mtools pkgs.ruby ];
         builder = ./image_builder.sh;
@@ -137,12 +137,13 @@ in rec {
     board_name = "Raspberry Pi Pico";
     file_name = "pico";
     MICROPY_BOARD = "RPI_PICO";
+    image_size_mb = "2";
     start_url = "https://www.raspberrypi.com/documentation/microcontrollers/pico-series.html";
     example_code = pkgs.fetchFromGitHub {
       owner = "pdg137";
       repo = "pico-blink-demo";
-      rev = "8b11ca2e9f2c697246ba90e10fe0d499e115a33f";  # 2024-01-16
-      hash = "sha256-gIJPw2MrCHhC4Uj6Zzv+UXefHkAz1psfzh+JH6xDSJU=";
+      rev = "92e56eb0498e78391e808220da9c21424685ba24";  # 2025-01-19
+      hash = "sha256-pS9YovP8Ar+GdclhSqLHXY71eEODQYdE0Mg111LrQ/o=";
     };
   };
 
@@ -150,6 +151,7 @@ in rec {
     board_name = "Pololu 3pi+ 2040 Robot";
     file_name = "pololu-3pi-2040-robot";
     MICROPY_BOARD = "POLOLU_3PI_2040_ROBOT";
+    image_size_mb = "16";
     start_url = "https://www.pololu.com/3pi/start";
     example_code = pkgs.fetchFromGitHub {
       owner = "pololu";
@@ -163,6 +165,7 @@ in rec {
     board_name = "Pololu Zumo 2040 Robot";
     file_name = "pololu-zumo-2040-robot";
     MICROPY_BOARD = "POLOLU_ZUMO_2040_ROBOT";
+    image_size_mb = "16";
     start_url = "https://www.pololu.com/zumo/start";
     example_code = pkgs.fetchFromGitHub {
       owner = "pololu";
