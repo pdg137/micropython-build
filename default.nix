@@ -34,6 +34,9 @@ let
 
        # Change the Pico firmware to use a 1MB USB Mass Storage filesystem.
       ./pico-1mb-mass-storage.patch
+
+      # Add main_menu.py support.
+      ./main-menu-py.patch
     ];
 
     # After changing the MicroPython version above, run
@@ -92,7 +95,10 @@ let
     hash = "sha256-quiL2Gi6AqJUpiLXuBXSmDw9rlaHmaZqMBralSEW35g=";
   };
 
-  pico_sdk_patches = [ ];
+  pico_sdk_patches = [
+    # Increase default clock speed to the new spec
+    ./200mhz.patch
+  ];
 
   ulab_src = pkgs.fetchFromGitHub rec {
     owner = "v923z";
