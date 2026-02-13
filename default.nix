@@ -23,8 +23,8 @@ let
   micropython = rec {
     src = pkgs.stdenv.mkDerivation rec {
       name = "micropython-${rev}";
-      rev = "v1.27.0";
-      outputHash = "sha256-IExtpwuiro4e/MCitJTYF4AzVYGTwtao23M9JiLLQic=";
+      rev = "supported-zumo";
+      outputHash = "sha256-uTLrr5rjyUmMy4lYKu7/puCu6tlrA4MAxLzU0rmH5W0=";
       outputHashAlgo = "sha256";
       outputHashMode = "recursive";
       builder = ./fetch_micropython.sh;
@@ -46,9 +46,6 @@ let
 
       # Add main_menu.py support.
       ./mpy-main-menu-py.patch
-
-      # Zumo is now supported in pico-sdk, so remove the temporary support.
-      ./mpy-supported-zumo.patch
     ];
   };
   # if rev is a commit instead of a tag, run "git describe --tags --match=v\*" to get this
